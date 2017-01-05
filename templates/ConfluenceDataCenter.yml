@@ -1,0 +1,977 @@
+---
+# bring up diffs between this file and the BitbucketDataCenter.template, and JiraDataCenter.template.
+# As a rule, we should work to minimize our diffs between these files as best we can, so that future changes are easy to make across all supported CloudFormation templates.
+# Using YAML as our file format will allow us to put a block comment at the top of the file saying exactly this.
+AWSTemplateFormatVersion: 2010-09-09
+Description: QS(0034) Atlassian Confluence Data Center Oct,19,2016
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Confluence setup
+          Parameters: 
+            - ConfluenceVersion
+      - Label:
+          default: Cluster nodes
+        Parameters: [ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax, SynchronyClusterNodeMin, SynchronyClusterNodeMax]
+      - Label:
+          default: Database
+        Parameters: [DBInstanceClass, DBMasterUserPassword, DBPassword, DBStorage, DBStorageType, DBIops, DBMultiAZ]
+      - Label:
+          default: Networking
+        Parameters: [VPC, ExternalSubnets, InternalSubnets, AssociatePublicIpAddress, CidrBlock, KeyName, SSLCertificateName]
+      - Label:
+          default: Advanced (Optional)
+        Parameters: [CatalinaOpts, StartCollectd, DBSnapshotId, ConfluenceDownloadUrl]
+    ParameterLabels:
+      AssociatePublicIpAddress:
+        default: Assign public IP
+      CatalinaOpts:
+        default: Catalina options
+      SynchronyClusterNodeMax:
+        default: Maximum number of Synchrony cluster nodes
+      SynchronyClusterNodeMin:
+        default: Minimum number of Synchrony cluster nodes
+      CidrBlock:
+        default: 0.0.0.0/0
+      ClusterNodeMax:
+        default: Maximum number of cluster nodes
+      ClusterNodeMin:
+        default: Minimum number of cluster nodes
+      ClusterNodeInstanceType:
+        default: Confluence cluster node instance type
+      DBInstanceClass:
+        default: Database instance class
+      DBMasterUserPassword:
+        default: Master password *
+      DBPassword:
+        default: Confluence database password *
+      DBStorage:
+        default: Database storage
+      DBStorageType:
+        default: Database storage type
+      DBIops:
+        default: RDS Provisioned IOPS
+      DBSnapshotId:
+        default: Database snapshot ID to restore
+      ConfluenceVersion:
+        default: Version *
+      ConfluenceDownloadUrl:
+        default: Confluence download URL
+      KeyName:
+        default: Key Name *
+      SSLCertificateName:
+        default: SSL Certificate Name
+      ExternalSubnets:
+        default: External subnets *
+      InternalSubnets:
+        default: Internal subnets *
+      VPC:
+        default: VPC *
+Parameters:
+  AssociatePublicIpAddress:
+    AllowedValues: [true, false]
+    ConstraintDescription: Must be 'true' or 'false'.
+    Default: true
+    Description: Controls if the EC2 instances are assigned a public IP address
+    Type: String
+  CidrBlock:
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
+    Default: 0.0.0.0/0
+    Description: The CIDR IP range that is permitted to access the Bitbucket URL. Use 0.0.0.0/0 if you want public access from the internet.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+  ClusterNodeMax:
+    Default: 1
+    Type: Number
+  ClusterNodeMin:
+    Default: 1
+    Type: Number
+  SynchronyClusterNodeMax:
+    Default: 1
+    Type: Number
+  SynchronyClusterNodeMin:
+    Type: Number
+    Default: 0
+  ClusterNodeInstanceType:
+    AllowedValues:
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - x1.32xlarge
+    ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
+    Default: c3.xlarge
+    Description: Instance type for the cluster nodes.
+    Type: String
+  CatalinaOpts:
+    Default: Java options passed to the JVM that runs Confluence.
+    Type: String
+  DBInstanceClass:
+    AllowedValues:
+      - db.m4.large
+      - db.m4.xlarge
+      - db.m4.2xlarge
+      - db.m4.4xlarge
+      - db.m4.10xlarge
+      - db.r3.large
+      - db.r3.xlarge
+      - db.r3.2xlarge
+      - db.r3.4xlarge
+      - db.r3.8xlarge
+      - db.t2.medium
+      - db.t2.large
+    ConstraintDescription: Must be a valid RDS instance class, 'db.t2.medium' or larger.
+    Description: RDS instance type
+    Default: db.m4.xlarge
+    Type: String
+  DBMasterUserPassword:
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must be at least 8 alphanumeric characters.
+    Default: "postgres"
+    Description: Database admin account password.
+    NoEcho: True
+    MinLength: 8
+    MaxLength: 128
+    Type: String
+  DBPassword:
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must be at least 8 alphanumeric characters.
+    Default: "confluence"
+    Description: "Database admin account password."
+    NoEcho: True
+    MinLength: 8
+    MaxLength: 128
+    Type: String
+  DBStorage:
+    Description: Database allocated storage size, in gigabytes (GB)
+    Default: 10
+    Type: Number
+  DBStorageType:
+    AllowedValues:
+      - General Purpose (SSD)
+      - Provisioned IOPS
+    ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
+    Description: Database storage type
+    Default: General Purpose (SSD)
+    Type: String
+  DBMultiAZ:
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
+    Default: true
+    Type: String
+  DBIops:
+    ConstraintDescription: Must be in the range 1000 - 30000.
+    Description: "Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00."
+    Default: 1000
+    MinValue: 1000
+    MaxValue: 3000
+    Type: Number
+  DBSnapshotId:
+    Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance
+    Type: String
+    Default: ""
+    ConstraintDescription:
+        Must be a valid RDS snapshot ID, or blank.
+  ConfluenceVersion:
+    AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
+    AllowedValues:
+      - 6.1.0-m09
+    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher"
+    Description: The version of Confluence to install
+    Type: String
+  ConfluenceDownloadUrl:
+    Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
+    Type: String
+    Default: "https://s3-ap-southeast-2.amazonaws.com/aws-deployment-test/releases/confluence/atlassian-confluence-6.1.0-m09-linux-x64.bin"
+    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.0-m09 or higher"
+  KeyName:
+    ConstraintDescription: Must be the name of an existing EC2 Key Pair.
+    Description: The EC2 Key Pair to allow SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+  SSLCertificateName:
+    Description: The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time
+    Default: ""
+    MinLength: 0
+    MaxLength: 50
+    Type: String
+  StartCollectd:
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
+    Description: Should the collectd service be started
+    Default: true
+    Type: String
+  ExternalSubnets:
+    ConstraintDescription: Must be a list of two or more Subnet ID's within the selected VPC.
+    Description: Subnets (two or more) where your user-facing load balancer will be deployed. MUST be within the selected VPC.
+    Type: "List<AWS::EC2::Subnet::Id>"
+  InternalSubnets:
+    ConstraintDescription: Must be a list of two or more Subnet ID's within the selected VPC.
+    Description: Subnets (two or more) where your cluster nodes and other internal infrastructure will be deployed. MUST be within the selected VPC. Specify the ExternalSubnets again here if you wish to deploy the whole stack into the same subnets.
+    Type: "List<AWS::EC2::Subnet::Id>"
+  VPC:
+     ConstraintDescription: Must be the ID of a VPC.
+     Description: Virtual Private Cloud
+     Type: "AWS::EC2::VPC::Id"
+Conditions:
+  DBProvisionedIops:
+    !Equals [!Ref DBStorageType, Provisioned IOPS]
+  DoCollectd:
+    !Equals [!Ref StartCollectd, true]
+  DoRestoreFromRDSSnapshot:
+    !Not [!Equals [!Ref DBSnapshotId, ""]]
+  DoSetDBMasterUserPassword:
+    !Not [!Equals [!Ref DBMasterUserPassword, ""]]
+  DoSSL:
+    !Not [!Equals [!Ref SSLCertificateName, ""]]
+Mappings:
+  AWSInstanceType2Arch:
+    c3.large:
+      Arch: HVM64
+    c3.xlarge:
+      Arch: HVM64
+    c3.2xlarge:
+      Arch: HVM64
+    c3.4xlarge:
+      Arch: HVM64
+    c3.8xlarge:
+      Arch: HVM64
+    c4.large:
+      Arch: HVM64
+    c4.xlarge:
+      Arch: HVM64
+    c4.2xlarge:
+      Arch: HVM64
+    c4.4xlarge:
+      Arch: HVM64
+    c4.8xlarge:
+      Arch: HVM64
+    d2.xlarge:
+      Arch: HVM64
+    d2.2xlarge:
+      Arch: HVM64
+    d2.4xlarge:
+      Arch: HVM64
+    d2.8xlarge:
+      Arch: HVM64
+    i2.xlarge:
+      Arch: HVM64
+    i2.2xlarge:
+      Arch: HVM64
+    i2.4xlarge:
+      Arch: HVM64
+    i2.8xlarge:
+      Arch: HVM64
+    m4.large:
+      Arch: HVM64
+    m4.xlarge:
+      Arch: HVM64
+    m4.2xlarge:
+      Arch: HVM64
+    m4.4xlarge:
+      Arch: HVM64
+    m4.10xlarge:
+      Arch: HVM64
+    m4.16xlarge:
+      Arch: HVM64
+    r3.large:
+      Arch: HVM64
+    r3.xlarge:
+      Arch: HVM64
+    r3.2xlarge:
+      Arch: HVM64
+    r3.4xlarge:
+      Arch: HVM64
+    r3.8xlarge:
+      Arch: HVM64
+    x1.32xlarge:
+      Arch: HVM64
+  AWSRegionArch2AMI:
+    ap-northeast-1:
+      HVM64: ami-cd90f8aa
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-2:
+      HVM64: ami-f5b0669b
+      HVMG2: NOT_SUPPORTED
+    ap-south-1:
+      HVM64: ami-05d0a76a
+      HVMG2: NOT_SUPPORTED
+    ap-southeast-1:
+      HVM64: ami-def957bd
+      HVMG2: NOT_SUPPORTED
+    ap-southeast-2:
+      HVM64: ami-63e7dc00
+      HVMG2: NOT_SUPPORTED
+    ca-central-1:
+      HVM64: ami-f923919d
+      HVMG2: NOT_SUPPORTED
+    eu-central-1:
+      HVM64: ami-cdfc3ca2
+      HVMG2: NOT_SUPPORTED
+    eu-west-1:
+      HVM64: ami-0c4d6d7f
+      HVMG2: NOT_SUPPORTED
+    eu-west-2:
+      HVM64: ami-37e8e253
+      HVMG2: NOT_SUPPORTED
+    sa-east-1:
+      HVM64: ami-7849d114
+      HVMG2: NOT_SUPPORTED
+    us-east-1:
+      HVM64: ami-1bbdb70c
+      HVMG2: NOT_SUPPORTED
+    us-east-2:
+      HVM64: ami-f9cf959c
+      HVMG2: NOT_SUPPORTED
+    us-west-1:
+      HVM64: ami-75065715
+      HVMG2: NOT_SUPPORTED
+    us-west-2:
+      HVM64: ami-536ade33
+      HVMG2: NOT_SUPPORTED
+Resources:
+  ConfluenceClusterNodeRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ["sts:AssumeRole"]
+      Path: /
+      Policies:
+        - PolicyName: ConfluenceClusterNodePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action: ["ec2:DescribeInstances"]
+                Effect: Allow
+                Resource: ["*"]
+              - Action: ["s3:ListBucket"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/aws-deployment-test/releases/confluence"]
+              - Action: ["s3:Get*"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/aws-deployment-test/releases/confluence/*"]
+              - Action: ["s3:ListBucket"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/atlassian-software/releases/confluence"]
+              - Action: ["s3:Get*"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/atlassian-software/releases/confluence/*"]
+              - Action: ["s3:ListBucket"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/atlassian-software/snapshots/confluence"]
+              - Action: ["s3:Get*"]
+                Effect: Allow
+                Resource: ["arn:aws:s3:::/atlassian-software/snapshots/confluence/*"]
+  ConfluenceClusterNodeInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: /
+      Roles: [!Ref ConfluenceClusterNodeRole]
+# Confluence node config
+  ClusterNodeGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      DesiredCapacity: !Ref ClusterNodeMin
+      LaunchConfigurationName: !Ref ClusterNodeLaunchConfig
+      MaxSize: !Ref ClusterNodeMax
+      MinSize: !Ref ClusterNodeMin
+      TargetGroupARNs: [!Ref MainTargetGroup]
+      VPCZoneIdentifier: !Ref InternalSubnets
+      Tags:
+        - Key: Name
+          Value: Confluence Node
+          PropagateAtLaunch: true
+        - Key: Cluster
+          Value: !Ref "AWS::StackName"
+          PropagateAtLaunch: true
+  ClusterNodeLaunchConfig:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    DependsOn:
+      - EFSMountAz1
+      - EFSMountAz2
+      - DB
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          default: [1]
+        "1":
+          packages:
+            !If
+              - DoCollectd
+              - yum:
+                  collectd: []
+                  collectd-java: []
+                  collectd-generic-jmx: []
+              - !Ref "AWS::NoValue"
+          files:
+            /etc/atl:
+              content:
+                !Join
+                  - "\n"
+                  -
+                    - !Sub
+                        - "ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony/v1"
+                        - Protocol: !If [DoSSL, "https", "http"]
+                          LoadBalancerName: !GetAtt LoadBalancer.DNSName
+                    - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
+                    - "ATL_RELEASE_S3_BUCKET=atlassian-software"
+                    - "ATL_RELEASE_S3_PATH=releases/confluence"
+                    - "ATL_APP_DATA_MOUNT_ENABLED=false"
+                    - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
+                    - "ATL_DB_NAME=confluence"
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
+                    - "ATL_JDBC_DRIVER=org.postgresql.Driver"
+                    - !Sub
+                      - "ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence"
+                      - DBEndpointAddress: !GetAtt DB.Endpoint.Address
+                        DBEndpointPort: !GetAtt DB.Endpoint.Port
+                    - "ATL_JDBC_USER=atlconfluence"
+                    - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
+                    - "ATL_ENABLED_PRODUCTS=Confluence"
+                    - "ATL_ENABLED_SHARED_HOMES="
+                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
+                    - "ATL_CONFLUENCE_DATA_CENTER=true"
+                    - "ATL_NGINX_ENABLED=false"
+                    - "ATL_POSTGRES_ENABLED=false"
+                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !GetAtt LoadBalancer.DNSName]
+                    - "ATL_SSL_SELF_CERT_ENABLED=false"
+                    - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
+                    - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
+                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+            /etc/cfn/cfn-hup.conf:
+              content: !Join
+                - "\n"
+                -
+                  - "[main]"
+                  - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
+                  - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
+              mode: 000400
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content:
+                !Join
+                  - "\n"
+                  -
+                    - "[cfn-auto-reloader-hook]"
+                    - triggers=post.update
+                    - "path=Resources.ClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
+                    - !Sub
+                      - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource ClusterNodeLaunchConfig --region ${Region}"
+                      - StackName: !Ref "AWS::StackName"
+                        Region: !Ref "AWS::Region"
+                    - runas=root
+          commands:
+            010_make_mount_point:
+              command: mkdir -p /media/atl
+              ignoreErrors: false
+            020_add_nfs_mount:
+              command:
+                !Join
+                  - ""
+                  -
+                    - "echo "
+                    - !Sub
+                        - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
+                        - ElasticFileSystem: !Ref ElasticFileSystem
+                          Region: !Ref "AWS::Region"
+                    - ":/ /media/atl nfs4 noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
+              ignoreErrors: false
+            030_mount_all:
+              command: mount -a
+              ignoreErrors: false
+            040_make_shared_home_dir:
+              command: mkdir -p /media/atl/confluence/shared-home
+              ignoreErrors: false
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
+              collectd:
+                !If [DoCollectd, {enabled: true, ensureRunning: true}, !Ref "AWS::NoValue"]
+              rpcbind:
+                enabled: true
+                ensureRunning: true
+                packages:
+                  yum: [nfs-utils]
+    Properties:
+      AssociatePublicIpAddress: !Ref AssociatePublicIpAddress
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvdf
+          Ebs: {}
+          NoDevice: true
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
+      ImageId:
+        !FindInMap
+          - AWSRegionArch2AMI
+          - !Ref "AWS::Region"
+          - !FindInMap
+              - AWSInstanceType2Arch
+              - !Ref ClusterNodeInstanceType
+              - Arch
+      InstanceType: !Ref ClusterNodeInstanceType
+      SecurityGroups: [!Ref SecurityGroup]
+      UserData:
+        Fn::Base64:
+          !Join
+            - ""
+            -
+              - "#!/bin/bash -xe\n"
+              - "yum update -y aws-cfn-bootstrap\n"
+              - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
+              - !Sub [" --resource ClusterNodeLaunchConfig --region ${Region}\n", Region: !Ref "AWS::Region"]
+              - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
+              - !Sub [" --resource ClusterNodeGroup --region ${Region}", Region: !Ref "AWS::Region"]
+  ClusterNodeScaleUpPolicy:
+    Type: "AWS::AutoScaling::ScalingPolicy"
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref ClusterNodeGroup
+      Cooldown: 600
+      ScalingAdjustment: 1
+  ClusterNodeScaleDownPolicy:
+    Type: "AWS::AutoScaling::ScalingPolicy"
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref ClusterNodeGroup
+      Cooldown: 600
+      ScalingAdjustment: -1
+  CPUAlarmHigh:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: Scale up if CPU > 60% for 5 minutes
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 60
+      AlarmActions: [!Ref ClusterNodeScaleUpPolicy]
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref ClusterNodeGroup
+      ComparisonOperator: GreaterThanThreshold
+  CPUAlarmLow:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: Scale down if CPU < 40% for 30 minutes
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 30
+      Threshold: 40
+      AlarmActions: [!Ref ClusterNodeScaleDownPolicy]
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref ClusterNodeGroup
+      ComparisonOperator: LessThanThreshold
+# Synchrony node config
+  SynchronyClusterNodeGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      DesiredCapacity: !Ref SynchronyClusterNodeMin
+      LaunchConfigurationName: !Ref SynchronyClusterNodeLaunchConfig
+      MaxSize: !Ref SynchronyClusterNodeMax
+      MinSize: !Ref SynchronyClusterNodeMin
+      TargetGroupARNs: [!Ref SynchronyTargetGroup]
+      VPCZoneIdentifier: !Ref InternalSubnets
+      Tags:
+        - Key: Name
+          Value: Confluence Synchrony Node
+          PropagateAtLaunch: true
+        - Key: micros_service_id
+          Value: !Ref "AWS::StackName"
+          PropagateAtLaunch: true
+        - Key: environment
+          Value: Production
+          PropagateAtLaunch: true
+  SynchronyClusterNodeLaunchConfig:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    DependsOn:
+      - EFSMountAz1
+      - EFSMountAz2
+      - DB
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          default: [1]
+        "1":
+          packages:
+            !If
+              - DoCollectd
+              - yum:
+                  collectd: []
+                  collectd-java: []
+                  collectd-generic-jmx: []
+              - Ref "AWS::NoValue"
+          files:
+            /etc/atl:
+              content:
+                !Join
+                  - "\n"
+                  -
+                    - !Sub
+                      - "ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony"
+                      - Protocol: !If [DoSSL, "https", "http"]
+                        LoadBalancerName: !GetAtt LoadBalancer.DNSName
+                    - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
+                    - "ATL_RELEASE_S3_BUCKET=atlassian-software"
+                    - "ATL_RELEASE_S3_PATH=releases/confluence"
+                    - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
+                    - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
+                    - "ATL_SYNCHRONY_MEMORY=-Xmx2g"
+                    - "ATL_APP_DATA_MOUNT_ENABLED=false"
+                    - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
+                    - "ATL_DB_NAME=confluence"
+                    - !Sub ["ATL_DB_HOST=$DbHost", DbHost: !GetAtt DB.Endpoint.Address]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
+                    - "ATL_JDBC_DRIVER=org.postgresql.Driver"
+                    - !Sub
+                      - "ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence"
+                      - DBEndpointAddress: !GetAtt DB.Endpoint.Address
+                        DBEndpointPort: !GetAtt DB.Endpoint.Port
+                    - "ATL_JDBC_USER=atlconfluence"
+                    - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
+                    - "ATL_ENABLED_PRODUCTS=Synchrony"
+                    - "ATL_ENABLED_SHARED_HOMES="
+                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
+                    - "ATL_CONFLUENCE_DATA_CENTER=true"
+                    - "ATL_NGINX_ENABLED=false"
+                    - "ATL_POSTGRES_ENABLED=false"
+                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !GetAtt LoadBalancer.DNSName]
+                    - "ATL_SSL_SELF_CERT_ENABLED=false"
+                    - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
+                    - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
+                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+            /etc/cfn/cfn-hup.conf:
+              content:
+                !Join
+                  - "\n"
+                  -
+                    - "[main]"
+                    - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
+                    - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
+              mode: 000400
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content:
+                !Join
+                  - "\n"
+                  -
+                    - "[cfn-auto-reloader-hook]"
+                    - triggers=post.update
+                    - "path=Resources.SynchronyClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
+                    - !Sub
+                      - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource SynchronyClusterNodeLaunchConfig --region ${Region}"
+                      - StackName: !Ref "AWS::StackName"
+                        Region: !Ref "AWS::Region"
+                    - runas=root
+          commands:
+            010_make_mount_point:
+              command: mkdir -p /media/atl
+              ignoreErrors: false
+            020_add_nfs_mount:
+              command:
+                !Join
+                  - ""
+                  -
+                    - "echo "
+                    - !Sub
+                        - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
+                        - ElasticFileSystem: !Ref ElasticFileSystem
+                          Region: !Ref "AWS::Region"
+                    - ":/ /media/atl nfs4 noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
+              ignoreErrors: false
+            030_mount_all:
+              command: mount -a
+              ignoreErrors: false
+            040_make_shared_home_dir:
+              command: mkdir -p /media/atl/confluence/shared-home
+              ignoreErrors: false
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
+              collectd:
+                !If [DoCollectd, {enabled: true, ensureRunning: true}, !Ref "AWS::NoValue"]
+              rpcbind:
+                enabled: true
+                ensureRunning: true
+                packages:
+                  yum: [nfs-utils]
+    Properties:
+      AssociatePublicIpAddress: !Ref AssociatePublicIpAddress
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvdf
+          Ebs: {}
+          NoDevice: true
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
+      ImageId:
+        !FindInMap
+          - AWSRegionArch2AMI
+          - !Ref "AWS::Region"
+          - !FindInMap
+              - AWSInstanceType2Arch
+              - !Ref ClusterNodeInstanceType
+              - Arch
+      InstanceType: !Ref ClusterNodeInstanceType
+      SecurityGroups: [!Ref SecurityGroup]
+      UserData:
+        Fn::Base64:
+          !Join
+            - ""
+            -
+              - "#!/bin/bash -xe\n"
+              - "yum update -y aws-cfn-bootstrap\n"
+              - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
+              - !Sub [" --resource SynchronyClusterNodeLaunchConfig --region ${Region}\n", Region: !Ref "AWS::Region"]
+              - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
+              - !Sub [" --resource SynchronyClusterNodeGroup --region ${Region}", Region: !Ref "AWS::Region"]
+  SynchronyClusterNodeScaleUpPolicy:
+    Type: "AWS::AutoScaling::ScalingPolicy"
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref SynchronyClusterNodeGroup
+      Cooldown: 600
+      ScalingAdjustment: 1
+  SynchronyClusterNodeScaleDownPolicy:
+    Type: "AWS::AutoScaling::ScalingPolicy"
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref SynchronyClusterNodeGroup
+      Cooldown: 600
+      ScalingAdjustment: -1
+  SynchronyCPUAlarmHigh:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: Scale up if CPU > 60% for 5 minutes
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 60
+      AlarmActions: [!Ref SynchronyClusterNodeScaleUpPolicy]
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref SynchronyClusterNodeGroup
+      ComparisonOperator: GreaterThanThreshold
+  SynchronyCPUAlarmLow:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmDescription: Scale down if CPU < 40% for 30 minutes
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 30
+      Threshold: 40
+      AlarmActions: [!Ref SynchronyClusterNodeScaleDownPolicy]
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref SynchronyClusterNodeGroup
+      ComparisonOperator: LessThanThreshold
+# Elastic file system
+  ElasticFileSystem:
+    Type: "AWS::EFS::FileSystem"
+    Properties:
+      FileSystemTags:
+        - Key: Application
+          Value: !Ref "AWS::StackId"
+  EFSMountAz1:
+    Type: "AWS::EFS::MountTarget"
+    Properties:
+      FileSystemId: !Ref ElasticFileSystem
+      SecurityGroups: [!Ref SecurityGroup]
+      SubnetId: !Select [0, !Ref InternalSubnets]
+  EFSMountAz2:
+    Type: "AWS::EFS::MountTarget"
+    Properties:
+      FileSystemId: !Ref ElasticFileSystem
+      SecurityGroups: [!Ref SecurityGroup]
+      SubnetId: !Select [1, !Ref InternalSubnets]
+# Database
+  DB:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AllocatedStorage: !Ref DBStorage
+      DBInstanceClass: !Ref DBInstanceClass
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DBSnapshotIdentifier: !If [DoRestoreFromRDSSnapshot, !Ref DBSnapshotId, !Ref "AWS::NoValue"]
+      Engine: postgres
+      EngineVersion: 9.5.2
+      MasterUsername: postgres
+      MasterUserPassword: !If [DoSetDBMasterUserPassword, !Ref DBMasterUserPassword, !Ref "AWS::NoValue"]
+      StorageType: !If [DBProvisionedIops, io1, gp2]
+      Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref "AWS::NoValue"]
+      MultiAZ: !Ref DBMultiAZ
+      VPCSecurityGroups: [!Ref SecurityGroup]
+      Tags:
+        - Key: Name
+          Value: Confluence PostgreSQL Database
+  DBSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+     DBSubnetGroupDescription: DBSubnetGroup
+     SubnetIds: !Ref InternalSubnets
+# Loadbalancer
+  LoadBalancer:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: 300
+      Subnets: !Ref ExternalSubnets
+      SecurityGroups: [!Ref SecurityGroup]
+  LoadBalancerListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MainTargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: !If [DoSSL, "443", "80"]
+      Protocol: !If [DoSSL, HTTPS, HTTP]
+  SynchronyListenerRule:
+    Type: "AWS::ElasticLoadBalancingV2::ListenerRule"
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref SynchronyTargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/synchrony/*"
+      ListenerArn: !Ref LoadBalancerListener
+      Priority: 1
+  MainTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Port: "8080"
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 4
+      Matcher:
+        HttpCode: 200
+      HealthCheckPath: /status
+      HealthCheckPort: 8080
+      HealthCheckProtocol: HTTP
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: true
+        - Key: stickiness.type
+          Value: lb_cookie
+      Tags:
+        - Key: Name
+          Value: MainTargetGroup
+        - Key: Cluster
+          Value: !Ref "AWS::StackName"
+    DependsOn:
+      - LoadBalancer
+  SynchronyTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Port: "8091"
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 4
+      Matcher:
+        HttpCode: 200
+      HealthCheckPath: /synchrony/heartbeat
+      HealthCheckPort: 8091
+      HealthCheckProtocol: HTTP
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: true
+        - Key: stickiness.type
+          Value: lb_cookie
+      Tags:
+        - Key: Name
+          Value: SynchronyTargetGroup
+        - Key: Cluster
+          Value: !Ref "AWS::StackName"
+    DependsOn:
+      - LoadBalancer
+  SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Security group allowing SSH and HTTP/HTTPS access
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 25500
+          ToPort: 25500
+          CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 5801
+          ToPort: 5801
+          CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 8091
+          ToPort: 8091
+          CidrIp: !Ref CidrBlock
+  SecurityGroupIngress:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      GroupId: !Ref SecurityGroup
+      IpProtocol: -1
+      FromPort: -1
+      ToPort: -1
+      SourceSecurityGroupId: !Ref SecurityGroup
+Outputs:
+  URL:
+    Description: The URL of the Bitbucket Data Center instance
+    Value: !Sub
+      - "${HTTP}://${LoadBalancerDNSName}"
+      - HTTP: !If [DoSSL, "https", "http"]
+        LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
