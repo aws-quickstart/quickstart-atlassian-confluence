@@ -396,7 +396,8 @@ Resources:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3-ap-southeast-2.amazonaws.com/shiva-publicdocs/ConfluenceDataCenter.yml
+      TemplateURL: !Join [/, [!FindInMap [AWSInfoRegionMap, !Ref 'AWS::Region', QuickStartS3URL],
+          !Ref 'QSS3BucketName', templates/ConfluenceDataCenter.template]]
       Parameters:
         VPC: !GetAtt [VPCStack, Outputs.VPCID]
         ExternalSubnets: !Join [',', [!GetAtt [VPCStack, Outputs.PublicSubnet1ID], !GetAtt [
