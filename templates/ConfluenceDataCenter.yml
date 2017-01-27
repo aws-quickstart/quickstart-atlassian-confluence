@@ -9,11 +9,10 @@ Metadata:
     ParameterGroups:
       - Label:
           default: Confluence setup
-          Parameters: 
-            - ConfluenceVersion
+        Parameters: [ConfluenceVersion]
       - Label:
           default: Cluster nodes
-        Parameters: [ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax, SynchronyClusterNodeMin, SynchronyClusterNodeMax]
+        Parameters: [ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax, SynchronyClusterNodeMin, SynchronyClusterNodeMax, SynchronyNodeInstanceType]
       - Label:
           default: Database
         Parameters: [DBInstanceClass, DBMasterUserPassword, DBPassword, DBStorage, DBStorageType, DBIops, DBMultiAZ]
@@ -32,6 +31,8 @@ Metadata:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
         default: Minimum number of Synchrony cluster nodes
+      SynchronyNodeInstanceType:
+        default: Confluence cluster node instance type        
       CidrBlock:
         default: 0.0.0.0/0
       ClusterNodeMax:
@@ -114,6 +115,25 @@ Parameters:
     Default: c3.xlarge
     Description: Instance type for the cluster nodes.
     Type: String
+  SynchronyNodeInstanceType:
+    AllowedValues:
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - x1.32xlarge
+    ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
+    Default: c3.xlarge
+    Description: Instance type for the Synchrony nodes.
+    Type: String    
   CatalinaOpts:
     Default: Java options passed to the JVM that runs Confluence.
     Type: String
@@ -195,7 +215,7 @@ Parameters:
   ConfluenceDownloadUrl:
     Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
     Type: String
-    Default: "https://s3-ap-southeast-2.amazonaws.com/aws-deployment-test/releases/confluence/atlassian-confluence-6.1.0-m09-linux-x64.bin"
+    Default: ""
     ConstraintDescription: "Must be a valid Confluence download url from version 6.1.0-m09 or higher"
   KeyName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
@@ -433,6 +453,7 @@ Resources:
                         - Protocol: !If [DoSSL, "https", "http"]
                           LoadBalancerName: !GetAtt LoadBalancer.DNSName
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
+                    - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
                     - "ATL_RELEASE_S3_PATH=releases/confluence"
                     - "ATL_APP_DATA_MOUNT_ENABLED=false"
@@ -642,6 +663,7 @@ Resources:
                       - Protocol: !If [DoSSL, "https", "http"]
                         LoadBalancerName: !GetAtt LoadBalancer.DNSName
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
+                    - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
                     - "ATL_RELEASE_S3_PATH=releases/confluence"
                     - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
@@ -746,9 +768,9 @@ Resources:
           - !Ref "AWS::Region"
           - !FindInMap
               - AWSInstanceType2Arch
-              - !Ref ClusterNodeInstanceType
+              - !Ref SynchronyNodeInstanceType
               - Arch
-      InstanceType: !Ref ClusterNodeInstanceType
+      InstanceType: !Ref SynchronyNodeInstanceType
       SecurityGroups: [!Ref SecurityGroup]
       UserData:
         Fn::Base64:
@@ -969,6 +991,12 @@ Resources:
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
 Outputs:
+  ClusterNodeGroup:
+    Description: The name of the auto scaling group of Confluence cluster nodes
+    Value: !Ref ClusterNodeGroup
+  SynchronyClusterNodeGroup:
+    Description: The name of the auto scaling group of Synchrony cluster nodes
+    Value: !Ref SynchronyClusterNodeGroup
   URL:
     Description: The URL of the Bitbucket Data Center instance
     Value: !Sub
