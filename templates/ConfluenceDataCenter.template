@@ -32,7 +32,7 @@ Metadata:
       SynchronyClusterNodeMin:
         default: Minimum number of Synchrony cluster nodes
       SynchronyNodeInstanceType:
-        default: Confluence cluster node instance type        
+        default: Confluence cluster node instance type
       CidrBlock:
         default: 0.0.0.0/0
       ClusterNodeMax:
@@ -133,7 +133,7 @@ Parameters:
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
     Description: Instance type for the Synchrony nodes.
-    Type: String    
+    Type: String
   CatalinaOpts:
     Default: Java options passed to the JVM that runs Confluence.
     Type: String
@@ -208,6 +208,8 @@ Parameters:
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
     AllowedValues:
+      - 6.1.0-beta2
+      - 6.1.0-m19
       - 6.1.0-m09
     ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher"
     Description: The version of Confluence to install
@@ -322,46 +324,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-cd90f8aa
+      HVM64: ami-8cd29beb
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-f5b0669b
+      HVM64: ami-c4fd2daa
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-05d0a76a
+      HVM64: ami-c9c0b1a6
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-def957bd
+      HVM64: ami-cc299faf
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-63e7dc00
+      HVM64: ami-c2e2e2a1
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-f923919d
+      HVM64: ami-327cc156
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-cdfc3ca2
+      HVM64: ami-13d3197c
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-0c4d6d7f
+      HVM64: ami-6b3f1d0d
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-37e8e253
+      HVM64: ami-c52134a1
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-7849d114
+      HVM64: ami-f024429c
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-1bbdb70c
+      HVM64: ami-cafc2bdc
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-f9cf959c
+      HVM64: ami-09d8fd6c
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-75065715
+      HVM64: ami-75de8115
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-536ade33
+      HVM64: ami-a37afbc3
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -651,6 +653,7 @@ Resources:
                   collectd: []
                   collectd-java: []
                   collectd-generic-jmx: []
+                  collectd-rrdtool: []
               - Ref "AWS::NoValue"
           files:
             /etc/atl:
@@ -998,7 +1001,7 @@ Outputs:
     Description: The name of the auto scaling group of Synchrony cluster nodes
     Value: !Ref SynchronyClusterNodeGroup
   URL:
-    Description: The URL of the Bitbucket Data Center instance
+    Description: The URL of the Confluence Data Center instance
     Value: !Sub
       - "${HTTP}://${LoadBalancerDNSName}"
       - HTTP: !If [DoSSL, "https", "http"]
