@@ -158,7 +158,6 @@ Parameters:
   DBMasterUserPassword:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
-    Default: "postgres"
     Description: Database admin account password.
     NoEcho: True
     MinLength: 8
@@ -167,7 +166,6 @@ Parameters:
   DBPassword:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
-    Default: "confluence"
     Description: "Database admin account password."
     NoEcho: True
     MinLength: 8
