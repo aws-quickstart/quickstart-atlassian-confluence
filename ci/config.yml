@@ -1,7 +1,7 @@
 global:
   marketplace-ami: false
   owner: quickstart-eng@amazon.com
-  qsname: quickstart-confluence
+  qsname: quickstart-atlassian-confluence
   regions:
     - ap-northeast-1
     - ap-northeast-2
@@ -19,9 +19,8 @@ global:
   reporting: true
  
 tests:
-  quickstart-confluencet1:
-    parameter_input: quickstart-confluence-example-params1.json
-    template_file: quickstart-confluence-example1.template
-  quickstart-confluencet2:
-    parameter_input: quickstart-confluence-example-params2.json
-    template_file: quickstart-confluence-example2.template
+  confluence:
+    parameter_input: quickstart-confluence-master-parms.json
+    template_file: quickstart-confluence-master.template
+    regions:
+      - us-east-1
