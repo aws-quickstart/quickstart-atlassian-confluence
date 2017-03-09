@@ -206,7 +206,8 @@ Parameters:
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
     AllowedValues:
-      - 6.1.0-beta2
+      - 6.1.0-rc1
+      - 6.1.0-beta7
       - 6.1.0-m19
       - 6.1.0-m09
     ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher"
