@@ -135,7 +135,7 @@ Parameters:
     Description: Instance type for the Synchrony nodes.
     Type: String
   CatalinaOpts:
-    Default: Java options passed to the JVM that runs Confluence.
+    Description: Java options passed to the JVM that runs Confluence.
     Type: String
   DBInstanceClass:
     AllowedValues:
