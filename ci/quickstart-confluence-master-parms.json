@@ -1,0 +1,34 @@
+[
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "cikey"
+  }, 
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "passwdfordb"
+  },
+  {
+    "ParameterKey": "AccessCIDR",
+    "ParameterValue": "1.2.3.4/32"
+  },
+  {
+    "ParameterKey": "ConfluenceVersion",
+    "ParameterValue": "6.1.0-rc1"
+  },
+  {
+    "ParameterKey": "AccessCIDR",
+    "ParameterValue": "1.2.3.4/32"
+  },
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "$[alfred_genpass_8]"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "$[alfred_genpass_8]"
+  },
+  {
+    "ParameterKey": "AccessCIDR",
+    "ParameterValue": "1.2.3.4/32"
+  }
+]
