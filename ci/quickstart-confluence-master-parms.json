@@ -5,7 +5,7 @@
   }, 
   {
     "ParameterKey": "AvailabilityZones",
-    "ParameterValue": "passwdfordb"
+    "ParameterValue": "$[alfred_genaz_2]"
   },
   {
     "ParameterKey": "AccessCIDR",
