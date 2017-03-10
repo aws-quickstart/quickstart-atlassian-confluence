@@ -13,7 +13,7 @@
   },
   {
     "ParameterKey": "ConfluenceVersion",
-    "ParameterValue": "6.1.0-rc1"
+    "ParameterValue": "6.1.0-m09"
   },
   {
     "ParameterKey": "AccessCIDR",
