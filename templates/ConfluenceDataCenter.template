@@ -135,7 +135,7 @@ Parameters:
     Description: Instance type for the Synchrony nodes.
     Type: String
   CatalinaOpts:
-    Default: Java options passed to the JVM that runs Confluence.
+    Description: Java options passed to the JVM that runs Confluence.
     Type: String
   DBInstanceClass:
     AllowedValues:
@@ -205,12 +205,7 @@ Parameters:
         Must be a valid RDS snapshot ID, or blank.
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    AllowedValues:
-      - 6.1.0-rc1
-      - 6.1.0-beta7
-      - 6.1.0-m19
-      - 6.1.0-m09
-    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher"
+    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   ConfluenceDownloadUrl:
