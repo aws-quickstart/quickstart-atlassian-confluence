@@ -34,7 +34,7 @@ Metadata:
       SynchronyNodeInstanceType:
         default: Confluence cluster node instance type
       CidrBlock:
-        default: 0.0.0.0/0
+        default: Permitted IP range
       ClusterNodeMax:
         default: Maximum number of cluster nodes
       ClusterNodeMin:
@@ -53,6 +53,8 @@ Metadata:
         default: Database storage type
       DBIops:
         default: RDS Provisioned IOPS
+      DBMultiAZ:
+        default: Enable RDS Multi-AZ deployment
       DBSnapshotId:
         default: Database snapshot ID to restore
       ConfluenceVersion:
@@ -79,8 +81,7 @@ Parameters:
   CidrBlock:
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
-    Default: 0.0.0.0/0
-    Description: The CIDR IP range that is permitted to access the Bitbucket URL. Use 0.0.0.0/0 if you want public access from the internet.
+    Description: The CIDR IP range that is permitted to access the Confluence URL. Use 0.0.0.0/0 if you want public access from the internet.
     Type: String
     MinLength: 9
     MaxLength: 18
@@ -113,7 +114,7 @@ Parameters:
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
-    Description: Instance type for the cluster nodes.
+    Description: Confluence cluster node instance type.
     Type: String
   SynchronyNodeInstanceType:
     AllowedValues:
@@ -132,7 +133,7 @@ Parameters:
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
-    Description: Instance type for the Synchrony nodes.
+    Description: Synchrony cluster node instance type.
     Type: String
   CatalinaOpts:
     Description: Java options passed to the JVM that runs Confluence.
@@ -158,6 +159,7 @@ Parameters:
   DBMasterUserPassword:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
+    Default: "postgres"
     Description: Database admin account password.
     NoEcho: True
     MinLength: 8
@@ -166,6 +168,7 @@ Parameters:
   DBPassword:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
+    Default: "confluence"
     Description: "Database admin account password."
     NoEcho: True
     MinLength: 8
@@ -228,7 +231,7 @@ Parameters:
       - true
       - false
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Should the collectd service be started
+    Description: Start the collectd service
     Default: true
     Type: String
   ExternalSubnets:
@@ -437,6 +440,7 @@ Resources:
                   collectd: []
                   collectd-java: []
                   collectd-generic-jmx: []
+                  collectd-rrdtool: []
               - !Ref "AWS::NoValue"
           files:
             /etc/atl:
