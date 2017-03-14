@@ -294,6 +294,7 @@ Parameters:
       IOPS.  Note: The ratio of iops per allocated-storage must be between 3.00 and
       10.00.'
     Type: Number
+    Default: 1000
     MinValue: '1000'
     MaxValue: '30000'
     ConstraintDescription: Must be in the range 1000 - 30000.
