@@ -213,9 +213,7 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    AllowedValues:
-      - 6.1.0-m09
-    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher"
+    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   ClusterNodeMax:
@@ -229,7 +227,7 @@ Parameters:
     Default: c3.xlarge
     AllowedValues: [c3.xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, i2.xlarge, i2.2xlarge,i2.4xlarge, i2.8xlarge, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge, x1.32xlarge]
     ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge' or larger
-    Description: Instance type for the cluster nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance
+    Description: Instance type for the cluster nodes.
   CatalinaOpts:
     Description: Java options passed to the JVM that runs Confluence.
     Type: String
@@ -310,7 +308,7 @@ Parameters:
   ConfluenceDownloadUrl:
     Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
     Type: String
-    Default: "https://s3-ap-southeast-2.amazonaws.com/aws-deployment-test/releases/confluence/atlassian-confluence-6.1.0-m09-linux-x64.bin"
+    Default: ""
     ConstraintDescription: "Must be a valid Confluence download url from version 6.1.0-m09 or higher"
   SynchronyClusterNodeMax:
     Default: 1
