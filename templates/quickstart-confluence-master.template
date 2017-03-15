@@ -233,7 +233,7 @@ Parameters:
     Type: String
     Default: ''
   DBSnapshotId:
-    Description: RDS snapshot ID of an existing backup to restore. Leave blank for a new instance
+    Description: RDS snapshot ID of an existing backup to restore. If you use this parameter you will also need to manually restore your shared home directory.  Leave blank for a new instance.
     Type: String
     Default: ""
     ConstraintDescription:
