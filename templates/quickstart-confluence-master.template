@@ -309,7 +309,7 @@ Parameters:
     Default: true
     Type: String
   ConfluenceDownloadUrl:
-    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter black to automatically download the official version you specified earlier.
+    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter blank to automatically download the official version you specified earlier.
     Type: String
     Default: ""
     ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
