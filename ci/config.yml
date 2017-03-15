@@ -8,7 +8,6 @@ global:
     - ap-south-1
     - ap-southeast-1
     - ap-southeast-2
-    - ca-central-1
     - eu-central-1
     - eu-west-1
     - sa-east-1
@@ -22,5 +21,3 @@ tests:
   confluence:
     parameter_input: quickstart-confluence-master-parms.json
     template_file: quickstart-confluence-master.template
-    regions:
-      - us-east-1
