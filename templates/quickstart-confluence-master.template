@@ -260,6 +260,7 @@ Parameters:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
     Description: Database admin account password.
+    Default: "postgres"
     NoEcho: True
     MinLength: 8
     MaxLength: 128
@@ -268,6 +269,7 @@ Parameters:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be at least 8 alphanumeric characters.
     Description: "Database admin account password."
+    Default: "confluence"
     NoEcho: True
     MinLength: 8
     MaxLength: 128
