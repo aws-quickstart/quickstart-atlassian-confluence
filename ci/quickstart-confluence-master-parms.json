@@ -30,9 +30,5 @@
   {
     "ParameterKey": "DBIops",
     "ParameterValue": "1000"
-  },
-  {
-    "ParameterKey": "AccessCIDR",
-    "ParameterValue": "1.2.3.4/32"
   }
 ]

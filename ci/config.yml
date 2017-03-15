@@ -23,3 +23,7 @@ tests:
   confluence:
     parameter_input: quickstart-confluence-master-parms.json
     template_file: quickstart-confluence-master.template
+    regions:
+    - eu-west-1
+    - us-east-1
+    - us-west-2
