@@ -213,7 +213,7 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    ConstraintDescription: "Must be a valid Confluence version number. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   ClusterNodeMax:
@@ -233,7 +233,7 @@ Parameters:
     Type: String
     Default: ''
   DBSnapshotId:
-    Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance
+    Description: RDS snapshot ID of an existing backup to restore. Leave blank for a new instance
     Type: String
     Default: ""
     ConstraintDescription:
@@ -310,7 +310,7 @@ Parameters:
     Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
     Type: String
     Default: ""
-    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.0-m09 or higher"
+    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
   SynchronyClusterNodeMax:
     Default: 1
     Type: Number
