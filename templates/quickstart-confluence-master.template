@@ -307,7 +307,7 @@ Parameters:
     Default: true
     Type: String
   ConfluenceDownloadUrl:
-    Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
+    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter black to automatically download the official version you specified earlier.
     Type: String
     Default: ""
     ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
