@@ -208,7 +208,7 @@ Parameters:
         Must be a valid RDS snapshot ID, or blank.
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    ConstraintDescription: "Must be a valid Confluence version number. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    ConstraintDescription: "Must be a valid Confluence version number, for example 6.1.0. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   ConfluenceDownloadUrl:
