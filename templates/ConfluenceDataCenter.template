@@ -32,7 +32,7 @@ Metadata:
       SynchronyClusterNodeMin:
         default: Minimum number of Synchrony cluster nodes
       SynchronyNodeInstanceType:
-        default: Confluence cluster node instance type
+        default: Synchrony cluster node instance type
       CidrBlock:
         default: Permitted IP range
       ClusterNodeMax:
