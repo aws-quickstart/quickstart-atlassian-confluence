@@ -32,9 +32,9 @@ Metadata:
       SynchronyClusterNodeMin:
         default: Minimum number of Synchrony cluster nodes
       SynchronyNodeInstanceType:
-        default: Confluence cluster node instance type
+        default: Synchrony cluster node instance type
       CidrBlock:
-        default: 0.0.0.0/0
+        default: Permitted IP range
       ClusterNodeMax:
         default: Maximum number of cluster nodes
       ClusterNodeMin:
@@ -53,6 +53,8 @@ Metadata:
         default: Database storage type
       DBIops:
         default: RDS Provisioned IOPS
+      DBMultiAZ:
+        default: Enable RDS Multi-AZ deployment
       DBSnapshotId:
         default: Database snapshot ID to restore
       ConfluenceVersion:
@@ -79,8 +81,7 @@ Parameters:
   CidrBlock:
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
-    Default: 0.0.0.0/0
-    Description: The CIDR IP range that is permitted to access the Bitbucket URL. Use 0.0.0.0/0 if you want public access from the internet.
+    Description: The CIDR IP range that is permitted to access the Confluence URL. Use 0.0.0.0/0 if you want public access from the internet.
     Type: String
     MinLength: 9
     MaxLength: 18
@@ -113,7 +114,7 @@ Parameters:
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
-    Description: Instance type for the cluster nodes.
+    Description: Confluence cluster node instance type.
     Type: String
   SynchronyNodeInstanceType:
     AllowedValues:
@@ -132,7 +133,7 @@ Parameters:
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
-    Description: Instance type for the Synchrony nodes.
+    Description: Synchrony cluster node instance type.
     Type: String
   CatalinaOpts:
     Description: Java options passed to the JVM that runs Confluence.
@@ -198,21 +199,21 @@ Parameters:
     MaxValue: 3000
     Type: Number
   DBSnapshotId:
-    Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance
+    Description: RDS snapshot ID of an existing backup to restore. If you use this parameter you will also need to manually restore your shared home directory.  Leave blank for a new instance.
     Type: String
     Default: ""
     ConstraintDescription:
         Must be a valid RDS snapshot ID, or blank.
   ConfluenceVersion:
     AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    ConstraintDescription: "Must be a valid Confluence version number. For example: 6.1.0-m09 or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    ConstraintDescription: "Must be a valid Confluence version number, for example 6.1.0. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   ConfluenceDownloadUrl:
-    Description: This is URL to download Confluence if we don't provide S3 bucket and Confluence version. This param is used to download custom Confluence version for testing purpose. Official version must be downloaded from release S3 bucket
+    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter blank to automatically download the official version you specified earlier.
     Type: String
     Default: ""
-    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.0-m09 or higher"
+    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
   KeyName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
@@ -228,7 +229,7 @@ Parameters:
       - true
       - false
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Should the collectd service be started
+    Description: Start the collectd service
     Default: true
     Type: String
   ExternalSubnets:
@@ -437,6 +438,7 @@ Resources:
                   collectd: []
                   collectd-java: []
                   collectd-generic-jmx: []
+                  collectd-rrdtool: []
               - !Ref "AWS::NoValue"
           files:
             /etc/atl:
