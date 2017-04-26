@@ -319,46 +319,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-8f446fe8
+      HVM64: ami-7dab801a
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-3b558755
+      HVM64: ami-835d8fed
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-ab7a08c4
+      HVM64: ami-17601278
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-0b1ba368
+      HVM64: ami-b5ef54d6
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-9c7a72ff
+      HVM64: ami-ef1b138c
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-77b80413
+      HVM64: ami-ddb804b9
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-d08e52bf
+      HVM64: ami-7fa97510
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-9f7d7cf9
+      HVM64: ami-5ddbda3b
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-10e6f274
+      HVM64: ami-8be1f5ef
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-40b8d52c
+      HVM64: ami-249df048
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-f077eee6
+      HVM64: ami-c60890d0
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-53456236
+      HVM64: ami-d24a6db7
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-a4d4f0c4
+      HVM64: ami-0daa8e6d
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-19871879
+      HVM64: ami-b176e9d1
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -990,6 +990,9 @@ Resources:
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
 Outputs:
+  ConfluenceTargetGroupARN:
+    Description: The name of the load balancer of Confluence cluster nodes
+    Value: !Ref MainTargetGroup
   ClusterNodeGroup:
     Description: The name of the auto scaling group of Confluence cluster nodes
     Value: !Ref ClusterNodeGroup
