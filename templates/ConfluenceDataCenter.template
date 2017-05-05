@@ -319,46 +319,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-a20a20c5
+      HVM64: ami-aaeec4cd
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-434f9d2d
+      HVM64: ami-797daf17
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-1a562475
+      HVM64: ami-87582ae8
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-4ab20929
+      HVM64: ami-4ca71c2f
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-da3d35b9
+      HVM64: ami-28cec64b
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-01b40865
+      HVM64: ami-c3bb07a7
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-3bed3154
+      HVM64: ami-f71dc198
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-6c6c6c0a
+      HVM64: ami-e0222286
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-e1e8fc85
+      HVM64: ami-3de8fc59
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-07e78a6b
+      HVM64: ami-9bf598f7
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-a2950fb4
+      HVM64: ami-f42f4ae2
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-885473ed
+      HVM64: ami-25597e40
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-5593b735
+      HVM64: ami-2a6d4a4a
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-fdfe609d
+      HVM64: ami-388c1258
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -881,6 +881,15 @@ Resources:
   LoadBalancerListener:
     Type: "AWS::ElasticLoadBalancingV2::Listener"
     Properties:
+      Certificates:
+        - CertificateArn:
+            !If
+              - DoSSL
+              - !Sub
+                - "arn:aws:iam::${AccountId}:server-certificate/${SSLCertificateName}"
+                - AccountId: !Ref "AWS::AccountId"
+                  SSLCertificateName: !Ref SSLCertificateName
+              - !Ref "AWS::NoValue"
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref MainTargetGroup
