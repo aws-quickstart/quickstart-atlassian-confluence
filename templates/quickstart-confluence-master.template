@@ -1,33 +1,85 @@
 ---
-
 AWSTemplateFormatVersion: 2010-09-09
-Description: 'Atlassian Confluence Data Center in new VPC License: Apache 2.0 (Please do not remove)'
+Description: 'Atlassian Confluence Data Center in new VPC License: Apache 2.0 (Please
+  do not remove)'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      - Label:
-          default: 'VPC Network Configuration'
-        Parameters: [AvailabilityZones, VPCCIDR, PrivateSubnet1CIDR, PrivateSubnet2CIDR, PublicSubnet1CIDR, PublicSubnet2CIDR, AccessCIDR, AssociatePublicIpAddress, SSLCertificateName]
-      - Label:
-          default: Confluence setup
-        Parameters: [ConfluenceVersion, ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax, SynchronyClusterNodeMin, SynchronyClusterNodeMax, SynchronyNodeInstanceType]
-      - Label:
-          default: Database
-        Parameters: [DBInstanceClass, DBMasterUserPassword, DBPassword, DBStorage, DBStorageType, DBIops, DBMultiAZ]
-      - Label:
-          default: Advanced (Optional)
-        Parameters: [CatalinaOpts, StartCollectd, DBSnapshotId, ConfluenceDownloadUrl]
-      - Label: 
-          default: Amazon EC2 Configuration
-        Parameters: [KeyName, NATInstanceType]
-      - Label:
-          default: AWS Quick Start Configuration
-        Parameters: [QSS3BucketName, QSS3KeyPrefix]
+    - Label:
+        default: VPC Network Configuration
+      Parameters:
+      - AvailabilityZones
+      - VPCCIDR
+      - PrivateSubnet1CIDR
+      - PrivateSubnet2CIDR
+      - PublicSubnet1CIDR
+      - PublicSubnet2CIDR
+      - AccessCIDR
+      - AssociatePublicIpAddress
+      - SSLCertificateName
+    - Label:
+        default: Linux Bastion Configuration
+      Parameters:
+      - BastionInstanceType
+      - BastionAMIOS
+      - BastionBanner
+      - EnableBanner
+    - Label:
+        default: Confluence setup
+      Parameters:
+      - ConfluenceVersion
+      - ClusterNodeInstanceType
+      - ClusterNodeMin
+      - ClusterNodeMax
+      - SynchronyClusterNodeMin
+      - SynchronyClusterNodeMax
+      - SynchronyNodeInstanceType
+    - Label:
+        default: Database
+      Parameters:
+      - DBInstanceClass
+      - DBMasterUserPassword
+      - DBPassword
+      - DBStorage
+      - DBStorageType
+      - DBIops
+      - DBMultiAZ
+    - Label:
+        default: Advanced (Optional)
+      Parameters:
+      - CatalinaOpts
+      - StartCollectd
+      - DBSnapshotId
+      - ConfluenceDownloadUrl
+    - Label:
+        default: Amazon EC2 Configuration
+      Parameters:
+      - KeyName
+      - NATInstanceType
+    - Label:
+        default: AWS Quick Start Configuration
+      Parameters:
+      - QSS3BucketName
+      - QSS3KeyPrefix
     ParameterLabels:
       AvailabilityZones:
         default: Availability Zones
       KeyName:
         default: Key Name
+      BastionAMIOS:
+        default: Bastion AMI Operating System
+      BastionBanner:
+        default: Bastion Banner
+      BastionInstanceType:
+        default: Bastion Instance Type
+      EnableBanner:
+        default: Enable Banner
+      EnableTCPForwarding:
+        default: Enable TCP Forwarding
+      EnableX11Forwarding:
+        default: Enable X11 Forwarding
+      NumBastionHosts:
+        default: Number of Bastion Hosts
       NATInstanceType:
         default: NAT Instance Type
       PrivateSubnet1CIDR:
@@ -86,80 +138,25 @@ Metadata:
         default: Database snapshot ID to restore
       SSLCertificateName:
         default: SSL Certificate Name
-    ParameterLabels:
-      AvailabilityZones:
-        default: Availability Zones
-      KeyName:
-        default: Key Name
-      NATInstanceType:
-        default: NAT Instance Type
-      PrivateSubnet1CIDR:
-        default: Private Subnet 1 CIDR
-      PrivateSubnet2CIDR:
-        default: Private Subnet 2 CIDR
-      PublicSubnet1CIDR:
-        default: Public Subnet 1 CIDR
-      PublicSubnet2CIDR:
-        default: Public Subnet 2 CIDR
-      QSS3BucketName:
-        default: Quick Start S3 Bucket Name
-      QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
-      AccessCIDR:
-        default: Permitted IP range
-      VPCCIDR:
-        default: VPC CIDR
-      AssociatePublicIpAddress:
-        default: Assign public IP
-      CatalinaOpts:
-        default: Catalina options
-      StartCollectd:
-        default: Start the collectd service
-      ClusterNodeMax:
-        default: Maximum number of cluster nodes
-      ClusterNodeMin:
-        default: Minimum number of cluster nodes
-      ClusterNodeInstanceType:
-        default: Confluence cluster node instance type
-      ConfluenceVersion:
-        default: Version of Confluence DataCenter
-      SynchronyClusterNodeMin:
-        default: Minimum number of Synchrony nodes
-      SynchronyClusterNodeMax:
-        default: Maximum number of Synchrony nodes
-      SynchronyNodeInstanceType:
-        default: Synchrony cluster node instance type
-      ConfluenceDownloadUrl:
-        default: Confluence download URL
-      DBInstanceClass:
-        default: RDS instance class
-      DBMasterUserPassword:
-        default: Master password
-      DBPassword:
-        default: Confluence database password
-      DBStorage:
-        default: Database storage
-      DBStorageType:
-        default: Database storage type
-      DBMultiAZ:
-        default: Enable RDS Multi-AZ deployment
-      DBIops:
-        default: RDS Provisioned IOPS
-      DBSnapshotId:
-        default: Database snapshot ID to restore
-      SSLCertificateName:
-        default: SSL Certificate Name                  
 Parameters:
   AvailabilityZones:
-    Description: 'List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.'
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
+      The logical order is preserved and only 2 AZs are used for this deployment.'
     Type: List<AWS::EC2::AvailabilityZone::Name>
   KeyName:
     Description: Public/private key pairs allow you to securely connect to your instance
       after it launches
     Type: AWS::EC2::KeyPair::KeyName
   NATInstanceType:
-    AllowedValues: [t2.nano, t2.micro, t2.small, t2.medium, t2.large, m3.medium, m3.large,
-      m4.large]
+    AllowedValues:
+    - t2.nano
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - m3.medium
+    - m3.large
+    - m4.large
     Default: t2.small
     Description: Amazon EC2 instance type for the NAT Instances. This is only used
       if the region does not support NAT gateways.
@@ -186,15 +183,18 @@ Parameters:
     Type: String
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen(-).
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen(-).
     Default: quickstart-reference
-    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name
+      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
+      It cannot start or end with a hyphen (-).
     Type: String
   QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.
-    Default: atlassian/confluence/latest
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+    Default: atlassian/confluence/latest/
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
@@ -203,17 +203,21 @@ Parameters:
     Type: String
   AccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: The CIDR IP range that is permitted to access Confluence. Use 0.0.0.0/0 if you want public access from the internet.
+    Description: The CIDR IP range that is permitted to access Confluence. Use 0.0.0.0/0
+      if you want public access from the internet.
     Type: String
   AssociatePublicIpAddress:
     Description: Controls if the EC2 instances are assigned a public IP address
     Type: String
     Default: 'true'
-    AllowedValues: ['true', 'false']
+    AllowedValues:
+    - 'true'
+    - 'false'
     ConstraintDescription: Must be 'true' or 'false'.
   ConfluenceVersion:
-    AllowedPattern: "(\\d+\\.\\d+\\.\\d+(-?.*))"
-    ConstraintDescription: "Must be a valid Confluence version number, for example 6.1.0. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    AllowedPattern: (\d+\.\d+\.\d+(-?.*))
+    ConstraintDescription: Must be a valid Confluence version number, for example
+      6.1.0. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes
     Description: The version of Confluence to install
     Type: String
   ClusterNodeMax:
@@ -225,50 +229,65 @@ Parameters:
   ClusterNodeInstanceType:
     Type: String
     Default: c3.xlarge
-    AllowedValues: [c3.xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, i2.xlarge, i2.2xlarge,i2.4xlarge, i2.8xlarge, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge, x1.32xlarge]
-    ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge' or larger
+    AllowedValues:
+    - c3.xlarge
+    - c3.2xlarge
+    - c3.4xlarge
+    - c3.8xlarge
+    - i2.xlarge
+    - i2.2xlarge
+    - i2.4xlarge
+    - i2.8xlarge
+    - r3.xlarge
+    - r3.2xlarge
+    - r3.4xlarge
+    - r3.8xlarge
+    - x1.32xlarge
+    ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge'
+      or larger
     Description: Confluence cluster node instance type.
   CatalinaOpts:
     Description: Java options passed to the JVM that runs Confluence.
     Type: String
     Default: ''
   DBSnapshotId:
-    Description: RDS snapshot ID of an existing backup to restore. If you use this parameter you will also need to manually restore your shared home directory.  Leave blank for a new instance.
+    Description: RDS snapshot ID of an existing backup to restore. If you use this
+      parameter you will also need to manually restore your shared home directory.  Leave
+      blank for a new instance.
     Type: String
-    Default: ""
-    ConstraintDescription:
-        Must be a valid RDS snapshot ID, or blank.
+    Default: ''
+    ConstraintDescription: Must be a valid RDS snapshot ID, or blank.
   DBInstanceClass:
     AllowedValues:
-      - db.m4.large
-      - db.m4.xlarge
-      - db.m4.2xlarge
-      - db.m4.4xlarge
-      - db.m4.10xlarge
-      - db.r3.large
-      - db.r3.xlarge
-      - db.r3.2xlarge
-      - db.r3.4xlarge
-      - db.r3.8xlarge
-      - db.t2.medium
-      - db.t2.large
+    - db.m4.large
+    - db.m4.xlarge
+    - db.m4.2xlarge
+    - db.m4.4xlarge
+    - db.m4.10xlarge
+    - db.r3.large
+    - db.r3.xlarge
+    - db.r3.2xlarge
+    - db.r3.4xlarge
+    - db.r3.8xlarge
+    - db.t2.medium
+    - db.t2.large
     ConstraintDescription: Must be a valid RDS instance class, 'db.t2.medium' or larger.
     Description: RDS instance type
     Default: db.m4.xlarge
     Type: String
   DBMasterUserPassword:
-    AllowedPattern: "[a-zA-Z0-9]*"
+    AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: Must be at least 8 alphanumeric characters.
     Description: Database admin account password.
-    NoEcho: True
+    NoEcho: true
     MinLength: 8
     MaxLength: 128
     Type: String
   DBPassword:
-    AllowedPattern: "[a-zA-Z0-9]*"
+    AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: Must be at least 8 alphanumeric characters.
-    Description: "Database admin account password."
-    NoEcho: True
+    Description: Database admin account password.
+    NoEcho: true
     MinLength: 8
     MaxLength: 128
     Type: String
@@ -282,12 +301,16 @@ Parameters:
     Description: Database storage type
     Type: String
     Default: General Purpose (SSD)
-    AllowedValues: [General Purpose (SSD), Provisioned IOPS]
+    AllowedValues:
+    - General Purpose (SSD)
+    - Provisioned IOPS
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
   DBMultiAZ:
     Type: String
     Default: 'true'
-    AllowedValues: ['true', 'false']
+    AllowedValues:
+    - 'true'
+    - 'false'
     ConstraintDescription: Must be 'true' or 'false'.
   DBIops:
     Description: 'Should be in the range of 1000 - 30000, and only used with Provisioned
@@ -300,17 +323,20 @@ Parameters:
     ConstraintDescription: Must be in the range 1000 - 30000.
   StartCollectd:
     AllowedValues:
-      - true
-      - false
+    - true
+    - false
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Should the collectd service be started
     Default: true
     Type: String
   ConfluenceDownloadUrl:
-    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter blank to automatically download the official version you specified earlier.
+    Description: This parameter is used to download a custom Confluence version for
+      testing purposes. Leave this parameter blank to automatically download the official
+      version you specified earlier.
     Type: String
-    Default: ""
-    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    Default: ''
+    ConstraintDescription: Must be a valid Confluence download url from version 6.1.x
+      or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes
   SynchronyClusterNodeMax:
     Default: 1
     Type: Number
@@ -320,21 +346,120 @@ Parameters:
   SynchronyNodeInstanceType:
     Type: String
     Default: c3.xlarge
-    AllowedValues: [c3.xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, i2.xlarge, i2.2xlarge,i2.4xlarge, i2.8xlarge, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge, x1.32xlarge]
-    ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge' or larger
+    AllowedValues:
+    - c3.xlarge
+    - c3.2xlarge
+    - c3.4xlarge
+    - c3.8xlarge
+    - i2.xlarge
+    - i2.2xlarge
+    - i2.4xlarge
+    - i2.8xlarge
+    - r3.xlarge
+    - r3.2xlarge
+    - r3.4xlarge
+    - r3.8xlarge
+    - x1.32xlarge
+    ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge'
+      or larger
     Description: Synchrony cluster node instance type.
   SSLCertificateName:
-    Description: The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time
-    Default: ""
+    Description: The name of your Server Certificate to use for HTTPS.  Leave blank
+      if you don't want to set up HTTPS at this time
+    Default: ''
     MinLength: 0
     MaxLength: 50
     Type: String
+  BastionAMIOS:
+    AllowedValues:
+    - Amazon-Linux-HVM
+    - CentOS-7-HVM
+    - Ubuntu-Server-14.04-LTS-HVM
+    - Ubuntu-Server-16.04-LTS-HVM
+    Default: Amazon-Linux-HVM
+    Description: The Linux distribution for the AMI to be used for the bastion instances
+    Type: String
+  BastionBanner:
+    Default: https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt
+    Description: Banner text to display upon login
+    Type: String
+  BastionInstanceType:
+    Description: Amazon EC2 instance type for the bastion instances
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+    - t2.nano
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - m3.large
+    - m3.xlarge
+    - m3.2xlarge
+    - m4.large
+    - m4.xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+  EnableBanner:
+    AllowedValues:
+    - 'true'
+    - 'false'
+    Default: 'false'
+    Description: To include a banner to be displayed when connecting via SSH to the
+      bastion, set this parameter to true
+    Type: String
+  EnableTCPForwarding:
+    Type: String
+    Description: Enable/Disable TCP Forwarding
+    Default: 'false'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  EnableX11Forwarding:
+    Type: String
+    Description: Enable/Disable X11 Forwarding
+    Default: 'false'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  NumBastionHosts:
+    AllowedValues:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    Default: '1'
+    Description: Enter the number of bastion hosts to create
+    Type: String
 Conditions:
-  DBProvisionedIops: !Equals [!Ref 'DBStorageType', Provisioned IOPS]
-  DoCollectd: !Not [!Equals [!Ref 'StartCollectd', '']]
-  DoRestoreFromRDSSnapshot: !Not [!Equals [!Ref 'DBSnapshotId', '']]
-  DoSetDBMasterUserPassword: !Not [!Equals [!Ref 'DBMasterUserPassword', '']]
-  DoSSL: !Not [!Equals [!Ref 'SSLCertificateName', '']]
+  DBProvisionedIops:
+    !Equals
+    - !Ref DBStorageType
+    - Provisioned IOPS
+  DoCollectd:
+    !Not
+    - !Equals
+      - !Ref StartCollectd
+      - ''
+  DoRestoreFromRDSSnapshot:
+    !Not
+    - !Equals
+      - !Ref DBSnapshotId
+      - ''
+  DoSetDBMasterUserPassword:
+    !Not
+    - !Equals
+      - !Ref DBMasterUserPassword
+      - ''
+  DoSSL:
+    !Not
+    - !Equals
+      - !Ref SSLCertificateName
+      - ''
+  GovCloudCondition:
+    !Equals
+    - !Ref AWS::Region
+    - us-gov-west-1
 Mappings:
   AWSInfoRegionMap:
     ap-northeast-1:
@@ -383,53 +508,126 @@ Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Join [/, [!FindInMap [AWSInfoRegionMap, !Ref 'AWS::Region', QuickStartS3URL],
-          !Ref 'QSS3BucketName', aws/vpc/latest/templates/aws-vpc.template]]
+      TemplateURL:
+        Fn::Sub:
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template
+        - QSS3Region:
+            Fn::If:
+            - GovCloudCondition
+            - s3-us-gov-west-1
+            - s3
       Parameters:
-        AvailabilityZones: !Join [',', !Ref 'AvailabilityZones']
-        KeyPairName: !Ref 'KeyName'
-        NATInstanceType: !Ref 'NATInstanceType'
+        AvailabilityZones:
+          !Join
+          - ','
+          - !Ref AvailabilityZones
+        KeyPairName: !Ref KeyName
+        NATInstanceType: !Ref NATInstanceType
         NumberOfAZs: '2'
-        PrivateSubnet1ACIDR: !Ref 'PrivateSubnet1CIDR'
-        PrivateSubnet2ACIDR: !Ref 'PrivateSubnet2CIDR'
-        PublicSubnet1CIDR: !Ref 'PublicSubnet1CIDR'
-        PublicSubnet2CIDR: !Ref 'PublicSubnet2CIDR'
-        VPCCIDR: !Ref 'VPCCIDR'
+        PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
+        PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
+        PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnet2CIDR
+        VPCCIDR: !Ref VPCCIDR
   ConfluenceDCStack:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Join [/, [!FindInMap [AWSInfoRegionMap, !Ref 'AWS::Region', QuickStartS3URL],
-          !Ref 'QSS3BucketName', !Ref 'QSS3KeyPrefix', templates/ConfluenceDataCenter.template]]
+      TemplateURL:
+        Fn::Sub:
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/ConfluenceDataCenter.template
+        - QSS3Region:
+            Fn::If:
+            - GovCloudCondition
+            - s3-us-gov-west-1
+            - s3
       Parameters:
-        VPC: !GetAtt [VPCStack, Outputs.VPCID]
-        ExternalSubnets: !Join [',', [!GetAtt [VPCStack, Outputs.PublicSubnet1ID], !GetAtt [
-              VPCStack, Outputs.PublicSubnet2ID]]]
-        InternalSubnets: !Join [',', [!GetAtt [VPCStack, Outputs.PrivateSubnet1AID], !GetAtt [
-              VPCStack, Outputs.PrivateSubnet2AID]]]
-        AssociatePublicIpAddress: !Ref 'AssociatePublicIpAddress'
-        ConfluenceVersion: !Ref 'ConfluenceVersion'
-        CidrBlock: !Ref 'AccessCIDR'
-        ClusterNodeMax: !Ref 'ClusterNodeMax'
-        ClusterNodeMin: !Ref 'ClusterNodeMin'
-        ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
-        CatalinaOpts: !Ref 'CatalinaOpts'
-        StartCollectd: !Ref 'StartCollectd'
-        DBInstanceClass: !Ref 'DBInstanceClass'
-        DBIops: !Ref 'DBIops'
-        DBMultiAZ: !Ref 'DBMultiAZ'
-        DBMasterUserPassword: !Ref 'DBMasterUserPassword'
-        DBPassword: !Ref 'DBPassword'
-        DBStorage: !Ref 'DBStorage'
-        DBStorageType: !Ref 'DBStorageType'
-        DBSnapshotId: !Ref 'DBSnapshotId'
-        SSLCertificateName: !Ref 'SSLCertificateName'
-        KeyName: !Ref 'KeyName'
-        SynchronyClusterNodeMin: !Ref 'SynchronyClusterNodeMin'
-        SynchronyClusterNodeMax: !Ref 'SynchronyClusterNodeMax'
-        SynchronyNodeInstanceType: !Ref 'SynchronyNodeInstanceType'
-        ConfluenceDownloadUrl: !Ref 'ConfluenceDownloadUrl'
+        VPC:
+          !GetAtt
+          - VPCStack
+          - Outputs.VPCID
+        ExternalSubnets:
+          !Join
+          - ','
+          - - !GetAtt
+              - VPCStack
+              - Outputs.PublicSubnet1ID
+            - !GetAtt
+              - VPCStack
+              - Outputs.PublicSubnet2ID
+        InternalSubnets:
+          !Join
+          - ','
+          - - !GetAtt
+              - VPCStack
+              - Outputs.PrivateSubnet1AID
+            - !GetAtt
+              - VPCStack
+              - Outputs.PrivateSubnet2AID
+        AssociatePublicIpAddress: !Ref AssociatePublicIpAddress
+        ConfluenceVersion: !Ref ConfluenceVersion
+        CidrBlock: !Ref AccessCIDR
+        ClusterNodeMax: !Ref ClusterNodeMax
+        ClusterNodeMin: !Ref ClusterNodeMin
+        ClusterNodeInstanceType: !Ref ClusterNodeInstanceType
+        CatalinaOpts: !Ref CatalinaOpts
+        StartCollectd: !Ref StartCollectd
+        DBInstanceClass: !Ref DBInstanceClass
+        DBIops: !Ref DBIops
+        DBMultiAZ: !Ref DBMultiAZ
+        DBMasterUserPassword: !Ref DBMasterUserPassword
+        DBPassword: !Ref DBPassword
+        DBStorage: !Ref DBStorage
+        DBStorageType: !Ref DBStorageType
+        DBSnapshotId: !Ref DBSnapshotId
+        SSLCertificateName: !Ref SSLCertificateName
+        KeyName: !Ref KeyName
+        SynchronyClusterNodeMin: !Ref SynchronyClusterNodeMin
+        SynchronyClusterNodeMax: !Ref SynchronyClusterNodeMax
+        SynchronyNodeInstanceType: !Ref SynchronyNodeInstanceType
+        ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl
+  LinuxBastionStack:
+    DependsOn: VPCStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template
+        - QSS3Region:
+            Fn::If:
+            - GovCloudCondition
+            - s3-us-gov-west-1
+            - s3
+      Parameters:
+        VPCID:
+          !GetAtt
+          - VPCStack
+          - Outputs.VPCID
+        PublicSubnet1ID:
+          !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet1ID
+        PublicSubnet2ID:
+          !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet2ID
+        BastionInstanceType: !Ref BastionInstanceType
+        BastionAMIOS: !Ref BastionAMIOS
+        BastionBanner: !Ref BastionBanner
+        EnableBanner: !Ref EnableBanner
+        KeyPairName: !Ref KeyName
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix:
+          !Join
+          - ''
+          - - !Ref QSS3KeyPrefix
+            - submodules/quickstart-linux-bastion/
+        RemoteAccessCIDR: !Ref AccessCIDR
+        NumBastionHosts: 1
 Outputs:
   ConfluenceURL:
     Description: The URL of the Confluence deployment
-    Value: !GetAtt [ConfluenceDCStack, Outputs.URL]
+    Value:
+      !GetAtt
+      - ConfluenceDCStack
+      - Outputs.URL
