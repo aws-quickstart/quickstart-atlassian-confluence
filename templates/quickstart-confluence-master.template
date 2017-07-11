@@ -24,6 +24,9 @@ Metadata:
       - BastionAMIOS
       - BastionBanner
       - EnableBanner
+      - EnableTCPForwarding
+      - EnableX11Forwarding
+      - NumBastionHosts
     - Label:
         default: Confluence setup
       Parameters:

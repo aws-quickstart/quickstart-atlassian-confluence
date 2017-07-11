@@ -21,7 +21,7 @@ Metadata:
         Parameters: [VPC, ExternalSubnets, InternalSubnets, AssociatePublicIpAddress, CidrBlock, KeyName, SSLCertificateName]
       - Label:
           default: 'Linux Bastion Configuration'
-        Parameters: [BastionInstanceType, BastionAMIOS, BastionBanner, EnableBanner]
+        Parameters: [BastionInstanceType, BastionAMIOS, BastionBanner, EnableBanner, EnableTCPForwarding, EnableX11Forwarding, NumBastionHosts]
       - Label:
           default: Advanced (Optional)
         Parameters: [CatalinaOpts, StartCollectd, DBSnapshotId, ConfluenceDownloadUrl]
