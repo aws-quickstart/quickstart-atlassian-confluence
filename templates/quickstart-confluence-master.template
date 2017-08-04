@@ -48,6 +48,9 @@ Metadata:
       - DBIops
       - DBMultiAZ
     - Label:
+        default: DNS (Optional)
+      Parameters: [HostedZone]
+    - Label:
         default: Advanced (Optional)
       Parameters:
       - CatalinaOpts
@@ -139,6 +142,8 @@ Metadata:
         default: RDS Provisioned IOPS
       DBSnapshotId:
         default: Database snapshot ID to restore
+      HostedZone:
+        default: R53 Hosted Zone (optional)
       SSLCertificateName:
         default: SSL Certificate Name
 Parameters:
@@ -366,6 +371,10 @@ Parameters:
     ConstraintDescription: Must be an EC2 instance type in the C3, I2, R3, or X1 family,'xlarge'
       or larger
     Description: Synchrony cluster node instance type.
+  HostedZone:
+    ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
+    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Type: String
   SSLCertificateName:
     Description: The name of your Server Certificate to use for HTTPS.  Leave blank
       if you don't want to set up HTTPS at this time
@@ -583,6 +592,7 @@ Resources:
         DBStorage: !Ref DBStorage
         DBStorageType: !Ref DBStorageType
         DBSnapshotId: !Ref DBSnapshotId
+        HostedZone: !Ref HostedZone
         SSLCertificateName: !Ref SSLCertificateName
         KeyName: !Ref KeyName
         SynchronyClusterNodeMin: !Ref SynchronyClusterNodeMin

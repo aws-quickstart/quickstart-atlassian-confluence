@@ -23,6 +23,9 @@ Metadata:
           default: 'Linux Bastion Configuration'
         Parameters: [BastionInstanceType, BastionAMIOS, BastionBanner, EnableBanner, EnableTCPForwarding, EnableX11Forwarding, NumBastionHosts]
       - Label:
+          default: DNS (Optional)
+        Parameters: [HostedZone]
+      - Label:
           default: Advanced (Optional)
         Parameters: [CatalinaOpts, StartCollectd, DBSnapshotId, ConfluenceDownloadUrl]
     ParameterLabels:
@@ -66,6 +69,8 @@ Metadata:
         default: Confluence download URL
       KeyName:
         default: Key Name *
+      HostedZone:
+        default: R53 Hosted Zone (optional)
       SSLCertificateName:
         default: SSL Certificate Name
       ExternalSubnets:
@@ -235,6 +240,10 @@ Parameters:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
+  HostedZone:
+    ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
+    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Type: String
   SSLCertificateName:
     Description: The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time
     Default: ""
@@ -331,6 +340,8 @@ Conditions:
     !Not [!Equals [!Ref DBSnapshotId, ""]]
   DoSetDBMasterUserPassword:
     !Not [!Equals [!Ref DBMasterUserPassword, ""]]
+  UseHostedZone:
+    !Not [!Equals [!Ref HostedZone, ""]]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateName, ""]]
   GovCloudCondition: 
@@ -399,46 +410,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-aaeec4cd
+      HVM64: ami-59907e3f
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-797daf17
+      HVM64: ami-52e0393c
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-87582ae8
+      HVM64: ami-68433807
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-4ca71c2f
+      HVM64: ami-69a23d0a
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-28cec64b
+      HVM64: ami-d3f3edb0
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-c3bb07a7
+      HVM64: ami-dff44abb
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-f71dc198
+      HVM64: ami-5d923d32
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-e0222286
+      HVM64: ami-d7a95dae
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-3de8fc59
+      HVM64: ami-fa20319e
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-9bf598f7
+      HVM64: ami-f02a5c9c
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-f42f4ae2
+      HVM64: ami-80d6f1fb
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-25597e40
+      HVM64: ami-741c3c11
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-2a6d4a4a
+      HVM64: ami-d2d6feb2
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-388c1258
+      HVM64: ami-2b957253
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -515,10 +526,11 @@ Resources:
             !If
               - DoCollectd
               - yum:
-                  collectd: []
+                  collectd: [5.7.1]
                   collectd-java: []
                   collectd-generic-jmx: []
                   collectd-rrdtool: []
+                  collectd-disk: []
               - !Ref "AWS::NoValue"
           files:
             /etc/atl:
@@ -552,7 +564,7 @@ Resources:
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
                     - "ATL_NGINX_ENABLED=false"
                     - "ATL_POSTGRES_ENABLED=false"
-                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !GetAtt LoadBalancer.DNSName]
+                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
                     - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
@@ -593,10 +605,13 @@ Resources:
                   - ""
                   -
                     - "echo "
-                    - !Sub
-                        - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
-                        - ElasticFileSystem: !Ref ElasticFileSystem
-                          Region: !Ref "AWS::Region"
+                    - !If
+                      - UseHostedZone
+                      - !Ref EFSCname
+                      - !Sub
+                          - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
+                          - ElasticFileSystem: !Ref ElasticFileSystem
+                            Region: !Ref "AWS::Region"
                     - ":/ /media/atl nfs4 noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
               ignoreErrors: false
             030_mount_all:
@@ -726,10 +741,11 @@ Resources:
             !If
               - DoCollectd
               - yum:
-                  collectd: []
+                  collectd: [5.7.1]
                   collectd-java: []
                   collectd-generic-jmx: []
                   collectd-rrdtool: []
+                  collectd-disk: []
               - Ref "AWS::NoValue"
           files:
             /etc/atl:
@@ -766,7 +782,7 @@ Resources:
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
                     - "ATL_NGINX_ENABLED=false"
                     - "ATL_POSTGRES_ENABLED=false"
-                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !GetAtt LoadBalancer.DNSName]
+                    - !Sub ["ATL_PROXY_NAME=${ProxyName}", ProxyName: !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
                     - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
@@ -808,10 +824,13 @@ Resources:
                   - ""
                   -
                     - "echo "
-                    - !Sub
-                        - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
-                        - ElasticFileSystem: !Ref ElasticFileSystem
-                          Region: !Ref "AWS::Region"
+                    - !If
+                      - UseHostedZone
+                      - !Ref EFSCname
+                      - !Sub
+                          - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
+                          - ElasticFileSystem: !Ref ElasticFileSystem
+                            Region: !Ref "AWS::Region"
                     - ":/ /media/atl nfs4 noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
               ignoreErrors: false
             030_mount_all:
@@ -925,6 +944,16 @@ Resources:
       FileSystemId: !Ref ElasticFileSystem
       SecurityGroups: [!Ref SecurityGroup]
       SubnetId: !Select [1, !Ref InternalSubnets]
+  EFSCname:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref HostedZone
+      Comment: Route53 cname for the efs
+      Name: !Join ['.', [!Ref "AWS::StackName", 'efs', !Ref 'HostedZone']]
+      Type: CNAME
+      TTL: '900'
+      ResourceRecords:
+        - !Join ['.', [!Ref ElasticFileSystem, 'efs', !Ref "AWS::Region", 'amazonaws.com.']]
 # Database
   DB:
     Type: "AWS::RDS::DBInstance"
@@ -976,6 +1005,16 @@ Resources:
       LoadBalancerArn: !Ref LoadBalancer
       Port: !If [DoSSL, "443", "80"]
       Protocol: !If [DoSSL, HTTPS, HTTP]
+  LoadBalancerCname:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref HostedZone
+      Comment: Route53 cname for the ALB
+      Name: !Join ['.', [!Ref "AWS::StackName", !Ref 'HostedZone']]
+      Type: CNAME
+      TTL: '900'
+      ResourceRecords:
+        - !GetAtt LoadBalancer.DNSName
   SynchronyListenerRule:
     Type: "AWS::ElasticLoadBalancingV2::ListenerRule"
     Properties:
@@ -1093,4 +1132,4 @@ Outputs:
     Value: !Sub
       - "${HTTP}://${LoadBalancerDNSName}"
       - HTTP: !If [DoSSL, "https", "http"]
-        LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
+        LoadBalancerDNSName: !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]
