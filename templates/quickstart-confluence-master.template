@@ -49,7 +49,7 @@ Metadata:
       - DBMultiAZ
     - Label:
         default: DNS (Optional)
-      Parameters: [HostedZone]
+      Parameters: [HostedZone, SubDomainName]
     - Label:
         default: Advanced (Optional)
       Parameters:
@@ -144,6 +144,8 @@ Metadata:
         default: Database snapshot ID to restore
       HostedZone:
         default: R53 Hosted Zone (optional)
+      SubDomainName:
+        default: Sub domain name will be used alone with HostedZone (optional)
       SSLCertificateName:
         default: SSL Certificate Name
 Parameters:
@@ -375,6 +377,9 @@ Parameters:
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
     Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
     Type: String
+  SubDomainName:
+    Description: Will be use alone with the Route53 PRIVATE Hosted Zone in which to create cnames
+    Type: String
   SSLCertificateName:
     Description: The name of your Server Certificate to use for HTTPS.  Leave blank
       if you don't want to set up HTTPS at this time
@@ -593,6 +598,7 @@ Resources:
         DBStorageType: !Ref DBStorageType
         DBSnapshotId: !Ref DBSnapshotId
         HostedZone: !Ref HostedZone
+        SubDomainName: !Ref SubDomainName
         SSLCertificateName: !Ref SSLCertificateName
         KeyName: !Ref KeyName
         SynchronyClusterNodeMin: !Ref SynchronyClusterNodeMin
