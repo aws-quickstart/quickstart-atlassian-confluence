@@ -955,6 +955,7 @@ Resources:
       SubnetId: !Select [1, !Ref InternalSubnets]
   EFSCname:
     Type: AWS::Route53::RecordSet
+    Condition: UseHostedZone
     Properties:
       HostedZoneName: !Ref HostedZone
       Comment: Route53 cname for the efs
@@ -1016,6 +1017,7 @@ Resources:
       Protocol: !If [DoSSL, HTTPS, HTTP]
   LoadBalancerCname:
     Type: AWS::Route53::RecordSet
+    Condition: UseHostedZone
     Properties:
       HostedZoneName: !Ref HostedZone
       Comment: Route53 cname for the ALB
