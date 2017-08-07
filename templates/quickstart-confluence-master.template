@@ -376,9 +376,11 @@ Parameters:
   HostedZone:
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
     Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Default: ""
     Type: String
   SubDomainName:
     Description: Will be use alone with the Route53 PRIVATE Hosted Zone in which to create cnames
+    Default: ""
     Type: String
   SSLCertificateName:
     Description: The name of your Server Certificate to use for HTTPS.  Leave blank
