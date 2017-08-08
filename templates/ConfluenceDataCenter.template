@@ -127,14 +127,32 @@ Parameters:
       - c3.2xlarge
       - c3.4xlarge
       - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
       - i2.xlarge
       - i2.2xlarge
       - i2.4xlarge
       - i2.8xlarge
+      - i3.large
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
       - r3.xlarge
       - r3.2xlarge
       - r3.4xlarge
       - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - x1.16xlarge
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
@@ -146,14 +164,32 @@ Parameters:
       - c3.2xlarge
       - c3.4xlarge
       - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
       - i2.xlarge
       - i2.2xlarge
       - i2.4xlarge
       - i2.8xlarge
+      - i3.large
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
       - r3.xlarge
       - r3.2xlarge
       - r3.4xlarge
       - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - x1.16xlarge
       - x1.32xlarge
     ConstraintDescription: "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     Default: c3.xlarge
@@ -393,6 +429,18 @@ Mappings:
       Arch: HVM64
     i2.8xlarge:
       Arch: HVM64
+    i3.large:
+      Arch: HVM64
+    i3.xlarge:
+      Arch: HVM64
+    i3.2xlarge:
+      Arch: HVM64
+    i3.4xlarge:
+      Arch: HVM64
+    i3.8xlarge:
+      Arch: HVM64
+    i3.16xlarge:
+      Arch: HVM64
     m4.large:
       Arch: HVM64
     m4.xlarge:
@@ -414,6 +462,20 @@ Mappings:
     r3.4xlarge:
       Arch: HVM64
     r3.8xlarge:
+      Arch: HVM64
+    r4.large:
+      Arch: HVM64
+    r4.xlarge:
+      Arch: HVM64
+    r4.2xlarge:
+      Arch: HVM64
+    r4.4xlarge:
+      Arch: HVM64
+    r4.8xlarge:
+      Arch: HVM64
+    r4.16xlarge:
+      Arch: HVM64
+    x1.16xlarge:
       Arch: HVM64
     x1.32xlarge:
       Arch: HVM64
@@ -1016,8 +1078,8 @@ Resources:
       Port: !If [DoSSL, "443", "80"]
       Protocol: !If [DoSSL, HTTPS, HTTP]
   LoadBalancerCname:
-    Type: AWS::Route53::RecordSet
     Condition: UseHostedZone
+    Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Ref HostedZone
       Comment: Route53 cname for the ALB
