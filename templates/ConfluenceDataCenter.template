@@ -20,9 +20,6 @@ Metadata:
           default: Networking
         Parameters: [VPC, ExternalSubnets, InternalSubnets, AssociatePublicIpAddress, CidrBlock, KeyName, SSLCertificateName]
       - Label:
-          default: 'Linux Bastion Configuration'
-        Parameters: [BastionInstanceType, BastionAMIOS, BastionBanner, EnableBanner, EnableTCPForwarding, EnableX11Forwarding, NumBastionHosts]
-      - Label:
           default: DNS (Optional)
         Parameters: [HostedZone, SubDomainName]
       - Label:
@@ -81,20 +78,6 @@ Metadata:
         default: Internal subnets *
       VPC:
         default: VPC *
-      BastionAMIOS:
-        default: Bastion AMI Operating System
-      BastionBanner:
-        default: Bastion Banner
-      BastionInstanceType:
-        default: Bastion Instance Type
-      EnableBanner:
-        default: Enable Banner
-      EnableTCPForwarding:
-        default: Enable TCP Forwarding
-      EnableX11Forwarding:
-        default: Enable X11 Forwarding
-      NumBastionHosts:
-        default: Number of Bastion Hosts
 Parameters:
   AssociatePublicIpAddress:
     AllowedValues: [true, false]
@@ -277,67 +260,6 @@ Parameters:
      ConstraintDescription: Must be the ID of a VPC.
      Description: Virtual Private Cloud
      Type: "AWS::EC2::VPC::Id"
-  BastionAMIOS:
-    AllowedValues:
-    - Amazon-Linux-HVM
-    - CentOS-7-HVM
-    - Ubuntu-Server-14.04-LTS-HVM
-    - Ubuntu-Server-16.04-LTS-HVM
-    Default: Amazon-Linux-HVM
-    Description: The Linux distribution for the AMI to be used for the bastion instances
-    Type: String
-  BastionBanner:
-    Default: https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt
-    Description: Banner text to display upon login
-    Type: String
-  BastionInstanceType:
-    Description: Amazon EC2 instance type for the bastion instances
-    Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t2.nano
-      - t2.micro
-      - t2.small
-      - t2.medium
-      - t2.large
-      - m3.large
-      - m3.xlarge
-      - m3.2xlarge
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
-  EnableBanner:
-    AllowedValues:
-      - 'true'
-      - 'false'
-    Default: 'false'
-    Description: To include a banner to be displayed when connecting via SSH to the bastion, set this parameter to true
-    Type: String
-  EnableTCPForwarding:
-    Type: String
-    Description: Enable/Disable TCP Forwarding
-    Default: 'false'
-    AllowedValues:
-      - 'true'
-      - 'false'
-  EnableX11Forwarding:
-    Type: String
-    Description: Enable/Disable X11 Forwarding
-    Default: 'false'
-    AllowedValues:
-      - 'true'
-      - 'false'
-
-  NumBastionHosts:
-    AllowedValues:
-      - '1'
-      - '2'
-      - '3'
-      - '4'
-    Default: '1'
-    Description: Enter the number of bastion hosts to create
-    Type: String
 Conditions:
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]

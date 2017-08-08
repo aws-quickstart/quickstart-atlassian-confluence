@@ -22,11 +22,6 @@ Metadata:
       Parameters:
       - BastionInstanceType
       - BastionAMIOS
-      - BastionBanner
-      - EnableBanner
-      - EnableTCPForwarding
-      - EnableX11Forwarding
-      - NumBastionHosts
     - Label:
         default: Confluence setup
       Parameters:
@@ -61,7 +56,6 @@ Metadata:
         default: Amazon EC2 Configuration
       Parameters:
       - KeyName
-      - NATInstanceType
     - Label:
         default: AWS Quick Start Configuration
       Parameters:
@@ -72,22 +66,10 @@ Metadata:
         default: Availability Zones
       KeyName:
         default: Key Name
-      BastionAMIOS:
-        default: Bastion AMI Operating System
-      BastionBanner:
-        default: Bastion Banner
       BastionInstanceType:
         default: Bastion Instance Type
-      EnableBanner:
-        default: Enable Banner
-      EnableTCPForwarding:
-        default: Enable TCP Forwarding
-      EnableX11Forwarding:
-        default: Enable X11 Forwarding
-      NumBastionHosts:
-        default: Number of Bastion Hosts
-      NATInstanceType:
-        default: NAT Instance Type
+      BastionAMIOS:
+        default: Bastion AMI Operating System
       PrivateSubnet1CIDR:
         default: Private Subnet 1 CIDR
       PrivateSubnet2CIDR:
@@ -389,19 +371,6 @@ Parameters:
     MinLength: 0
     MaxLength: 50
     Type: String
-  BastionAMIOS:
-    AllowedValues:
-    - Amazon-Linux-HVM
-    - CentOS-7-HVM
-    - Ubuntu-Server-14.04-LTS-HVM
-    - Ubuntu-Server-16.04-LTS-HVM
-    Default: Amazon-Linux-HVM
-    Description: The Linux distribution for the AMI to be used for the bastion instances
-    Type: String
-  BastionBanner:
-    Default: https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt
-    Description: Banner text to display upon login
-    Type: String
   BastionInstanceType:
     Description: Amazon EC2 instance type for the bastion instances
     Type: String
@@ -419,36 +388,14 @@ Parameters:
     - m4.xlarge
     - m4.2xlarge
     - m4.4xlarge
-  EnableBanner:
+  BastionAMIOS:
     AllowedValues:
-    - 'true'
-    - 'false'
-    Default: 'false'
-    Description: To include a banner to be displayed when connecting via SSH to the
-      bastion, set this parameter to true
-    Type: String
-  EnableTCPForwarding:
-    Type: String
-    Description: Enable/Disable TCP Forwarding
-    Default: 'false'
-    AllowedValues:
-    - 'true'
-    - 'false'
-  EnableX11Forwarding:
-    Type: String
-    Description: Enable/Disable X11 Forwarding
-    Default: 'false'
-    AllowedValues:
-    - 'true'
-    - 'false'
-  NumBastionHosts:
-    AllowedValues:
-    - '1'
-    - '2'
-    - '3'
-    - '4'
-    Default: '1'
-    Description: Enter the number of bastion hosts to create
+    - Amazon-Linux-HVM
+    - CentOS-7-HVM
+    - Ubuntu-Server-14.04-LTS-HVM
+    - Ubuntu-Server-16.04-LTS-HVM
+    Default: Amazon-Linux-HVM
+    Description: The Linux distribution for the AMI to be used for the bastion instances
     Type: String
 Conditions:
   DBProvisionedIops:
@@ -541,7 +488,6 @@ Resources:
           - ','
           - !Ref AvailabilityZones
         KeyPairName: !Ref KeyName
-        NATInstanceType: !Ref NATInstanceType
         NumberOfAZs: '2'
         PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
         PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
@@ -634,8 +580,6 @@ Resources:
           - Outputs.PublicSubnet2ID
         BastionInstanceType: !Ref BastionInstanceType
         BastionAMIOS: !Ref BastionAMIOS
-        BastionBanner: !Ref BastionBanner
-        EnableBanner: !Ref EnableBanner
         KeyPairName: !Ref KeyName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix:
@@ -644,7 +588,7 @@ Resources:
           - - !Ref QSS3KeyPrefix
             - submodules/quickstart-linux-bastion/
         RemoteAccessCIDR: !Ref AccessCIDR
-        NumBastionHosts: 1
+        NumBastionHosts: 2
 Outputs:
   ConfluenceURL:
     Description: The URL of the Confluence deployment
