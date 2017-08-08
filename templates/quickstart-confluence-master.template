@@ -143,9 +143,9 @@ Metadata:
       DBSnapshotId:
         default: Database snapshot ID to restore
       HostedZone:
-        default: R53 Hosted Zone (optional)
+        default: Route 53 Hosted Zone (optional)
       SubDomainName:
-        default: Sub domain name will be used alone with HostedZone (optional)
+        default: Sub-domain for Hosted Zone (optional)
       SSLCertificateName:
         default: SSL Certificate Name
 Parameters:
@@ -375,11 +375,11 @@ Parameters:
     Description: Synchrony cluster node instance type.
   HostedZone:
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
-    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Description: Domain name of the Route 53 private Hosted Zone in which to create cnames.
     Default: ""
     Type: String
   SubDomainName:
-    Description: Will be use alone with the Route53 PRIVATE Hosted Zone in which to create cnames
+    Description: Leave this field blank to use your stack name as the sub-domain.
     Default: ""
     Type: String
   SSLCertificateName:
