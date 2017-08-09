@@ -30,6 +30,8 @@ Metadata:
         default: Assign public IP
       CatalinaOpts:
         default: Catalina options
+      StartCollectd:
+        default: Start the collectd service
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
