@@ -405,46 +405,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-5d9e653b
+      HVM64: ami-e16e9587
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-94469efa
+      HVM64: ami-f36db59d
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-6b652104
+      HVM64: ami-0d83c762
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-06e48665
+      HVM64: ami-5b660b38
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-b4886dd6
+      HVM64: ami-01c42163
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-ae3a84ca
+      HVM64: ami-56239d32
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-04de6b6b
+      HVM64: ami-d5982dba
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-77fc060e
+      HVM64: ami-17609a6e
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-16cede72
+      HVM64: ami-39e7f75d
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-b15221dd
+      HVM64: ami-cbb7c4a7
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-19454d62
+      HVM64: ami-9d9992e6
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-c9ad8eac
+      HVM64: ami-5bbf9c3e
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-39162259
+      HVM64: ami-55f3c735
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-b6f71dce
+      HVM64: ami-c140aab9
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -783,7 +783,7 @@ Resources:
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
-                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
+                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=micros_service_id"
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
             /etc/cfn/cfn-hup.conf:
               content:
