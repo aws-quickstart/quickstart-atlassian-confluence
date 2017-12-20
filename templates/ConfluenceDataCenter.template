@@ -405,46 +405,46 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-e16e9587
+      HVM64: ami-75be3813
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-f36db59d
+      HVM64: ami-8ab91fe4
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-0d83c762
+      HVM64: ami-63eda40c
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-5b660b38
+      HVM64: ami-ceee8ab2
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-01c42163
+      HVM64: ami-78af581a
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-56239d32
+      HVM64: ami-0201ba66
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-d5982dba
+      HVM64: ami-c7a32aa8
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-17609a6e
+      HVM64: ami-69ec5410
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-39e7f75d
+      HVM64: ami-56fae432
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-cbb7c4a7
+      HVM64: ami-1fb3f473
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-9d9992e6
+      HVM64: ami-6c8ae916
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-5bbf9c3e
+      HVM64: ami-edc9e088
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-55f3c735
+      HVM64: ami-666e6b06
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-c140aab9
+      HVM64: ami-1d76d365
       HVMG2: NOT_SUPPORTED
 Resources:
   ConfluenceClusterNodeRole:
@@ -567,6 +567,7 @@ Resources:
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
                     - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_USE_COLLECTD=${UseCollectd}", UseCollectd: !Ref StartCollectd]
             /etc/cfn/cfn-hup.conf:
               content: !Join
                 - "\n"
@@ -785,6 +786,7 @@ Resources:
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
                     - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=micros_service_id"
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_USE_COLLECTD=${UseCollectd}", UseCollectd: !Ref StartCollectd]
             /etc/cfn/cfn-hup.conf:
               content:
                 !Join
