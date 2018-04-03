@@ -2,7 +2,7 @@
   {
     "ParameterKey": "KeyName",
     "ParameterValue": "cikey"
-  }, 
+  },
   {
     "ParameterKey": "AvailabilityZones",
     "ParameterValue": "$[alfred_genaz_2]"
@@ -18,6 +18,14 @@
   {
     "ParameterKey": "AccessCIDR",
     "ParameterValue": "1.2.3.4/32"
+  },
+  {
+    "ParameterKey": "SubDomainName",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "HostedZone",
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "DBMasterUserPassword",
