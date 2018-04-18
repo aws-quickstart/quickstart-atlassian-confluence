@@ -397,7 +397,7 @@ Parameters:
     Description: The Linux distribution for the AMI to be used for the bastion instances
     Type: String
   BastionBanner:
-    Default: https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt
+    Default: https://s3.amazonaws.com/aws-quickstart/quickstart-linux-bastion/scripts/banner_message.txt
     Description: Banner text to display upon login
     Type: String
   BastionInstanceType:
