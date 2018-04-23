@@ -21,11 +21,11 @@
   },
   {
     "ParameterKey": "SubDomainName",
-    "ParameterValue": "a.awsqs.com"
+    "ParameterValue": "a"
   },
   {
     "ParameterKey": "HostedZone",
-    "ParameterValue": "awsqs.com"
+    "ParameterValue": "awsqs.com."
   },
   {
     "ParameterKey": "DBMasterUserPassword",
