@@ -21,7 +21,7 @@
   },
   {
     "ParameterKey": "SubDomainName",
-    "ParameterValue": "atlassian-conflucence-$[alfred_random-string]"
+    "ParameterValue": "atlassian-conflucence-$[taskcat_random-string]"
   },
   {
     "ParameterKey": "HostedZone",
