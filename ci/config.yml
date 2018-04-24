@@ -26,3 +26,4 @@ tests:
     regions:
     - eu-west-1
     - us-west-2
+    - us-east-1
