@@ -117,6 +117,11 @@ Parameters:
       - c4.2xlarge
       - c4.4xlarge
       - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
       - i2.xlarge
       - i2.2xlarge
       - i2.4xlarge
@@ -154,6 +159,11 @@ Parameters:
       - c4.2xlarge
       - c4.4xlarge
       - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
       - i2.xlarge
       - i2.2xlarge
       - i2.4xlarge
@@ -336,6 +346,16 @@ Mappings:
     c4.4xlarge:
       Arch: HVM64
     c4.8xlarge:
+      Arch: HVM64
+    c5.large:
+      Arch: HVM64
+    c5.xlarge:
+      Arch: HVM64
+    c5.2xlarge:
+      Arch: HVM64
+    c5.4xlarge:
+      Arch: HVM64
+    c5.9xlarge:
       Arch: HVM64
     d2.xlarge:
       Arch: HVM64
