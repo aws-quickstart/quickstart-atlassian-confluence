@@ -559,7 +559,7 @@ Resources:
                     - !Sub
                         - "ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony/v1"
                         - Protocol: !If [DoSSL, "https", "http"]
-                          LoadBalancerName: !GetAtt LoadBalancer.DNSName
+                          LoadBalancerName: !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
@@ -775,7 +775,7 @@ Resources:
                     - !Sub
                       - "ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony"
                       - Protocol: !If [DoSSL, "https", "http"]
-                        LoadBalancerName: !GetAtt LoadBalancer.DNSName
+                        LoadBalancerName: !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
