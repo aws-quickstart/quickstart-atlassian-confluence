@@ -217,6 +217,11 @@ Parameters:
     - c4.2xlarge
     - c4.4xlarge
     - c4.8xlarge
+    - c5.large
+    - c5.xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
     - i2.xlarge
     - i2.2xlarge
     - i2.4xlarge
@@ -352,6 +357,11 @@ Parameters:
     - c4.2xlarge
     - c4.4xlarge
     - c4.8xlarge
+    - c5.large
+    - c5.xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
     - i2.xlarge
     - i2.2xlarge
     - i2.4xlarge
