@@ -38,5 +38,9 @@
   {
     "ParameterKey": "DBIops",
     "ParameterValue": "1000"
+  },
+  {
+    "ParameterKey":"QSS3BucketName",
+    "ParameterValue":"$[taskcat_autobucket]"
   }
 ]
