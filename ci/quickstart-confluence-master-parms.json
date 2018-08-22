@@ -1,11 +1,11 @@
 [
   {
     "ParameterKey": "KeyName",
-    "ParameterValue": "cikey"
+    "ParameterValue": "replaced-by-taskcat-override-file"
   },
   {
     "ParameterKey": "AvailabilityZones",
-    "ParameterValue": "$[alfred_genaz_2]"
+    "ParameterValue": "$[taskcat_genaz_2]"
   },
   {
     "ParameterKey": "AccessCIDR",
@@ -29,11 +29,11 @@
   },
   {
     "ParameterKey": "DBMasterUserPassword",
-    "ParameterValue": "$[alfred_genpass_8]"
+    "ParameterValue": "$[taskcat_genpass_8]"
   },
   {
     "ParameterKey": "DBPassword",
-    "ParameterValue": "$[alfred_genpass_8]"
+    "ParameterValue": "$[taskcat_genpass_8]"
   },
   {
     "ParameterKey": "DBIops",
