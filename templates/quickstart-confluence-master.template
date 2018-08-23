@@ -55,7 +55,7 @@ Metadata:
     - Label:
         default: Amazon EC2 Configuration
       Parameters:
-      - KeyName
+      - KeyPairName
     - Label:
         default: AWS Quick Start Configuration
       Parameters:
@@ -64,7 +64,7 @@ Metadata:
     ParameterLabels:
       AvailabilityZones:
         default: Availability Zones
-      KeyName:
+      KeyPairName:
         default: Key Name
       BastionInstanceType:
         default: Bastion Instance Type
@@ -135,7 +135,7 @@ Parameters:
     Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
       The logical order is preserved and only 2 AZs are used for this deployment.'
     Type: List<AWS::EC2::AvailabilityZone::Name>
-  KeyName:
+  KeyPairName:
     Description: Public/private key pairs allow you to securely connect to your instance
       after it launches
     Type: AWS::EC2::KeyPair::KeyName
@@ -519,7 +519,7 @@ Resources:
           !Join
           - ','
           - !Ref AvailabilityZones
-        KeyPairName: !Ref KeyName
+        KeyPairName: !Ref KeyPairName
         NumberOfAZs: '2'
         PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
         PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
@@ -580,7 +580,7 @@ Resources:
         HostedZone: !Ref HostedZone
         SubDomainName: !Ref SubDomainName
         SSLCertificateName: !Ref SSLCertificateName
-        KeyName: !Ref KeyName
+        KeyName: !Ref KeyPairName
         SynchronyClusterNodeMin: !Ref SynchronyClusterNodeMin
         SynchronyClusterNodeMax: !Ref SynchronyClusterNodeMax
         SynchronyNodeInstanceType: !Ref SynchronyNodeInstanceType
@@ -612,7 +612,7 @@ Resources:
           - Outputs.PublicSubnet2ID
         BastionInstanceType: !Ref BastionInstanceType
         BastionAMIOS: !Ref BastionAMIOS
-        KeyPairName: !Ref KeyName
+        KeyPairName: !Ref KeyPairName
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix:
           !Join
