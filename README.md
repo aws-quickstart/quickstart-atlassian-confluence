@@ -1,4 +1,5 @@
 # quickstart-confluence
+Please send `PRs`,`issues` and `feature request` to the upstream repo here https://bitbucket.org/atlassian/atlassian-aws-deployment/src/c72c1496000de07d90ba2f98ad4309fe229ad19d/quickstarts/
 ## Confluence Data Center on AWS Cloud
 
 Use this Quick Start to deploy Confluence Data Center from Atlassian on the AWS Cloud in less than 30 minutes. Confluence is team collaboration software that changes how modern teams work. Confluence Data Center is a self-managed solution that gives you high availability, performance at scale, and disaster recovery for uninterrupted access to Confluence for all your teams.
