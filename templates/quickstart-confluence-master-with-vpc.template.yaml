@@ -84,6 +84,11 @@ Metadata:
           - TomcatProtocol
           - TomcatRedirectPort
           - TomcatScheme
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
     ParameterLabels:
       AssociatePublicIpAddress:
         default: Assign public IP
@@ -187,6 +192,10 @@ Metadata:
         default: Tomcat Redirect Port
       TomcatScheme:
         default: Tomcat protocol Scheme
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
 
 Parameters:
   AssociatePublicIpAddress:
