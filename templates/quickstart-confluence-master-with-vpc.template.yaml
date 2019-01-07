@@ -1,9 +1,6 @@
 ---
-# Bring up diffs between this file and the BitbucketDataCenter.template.yaml, ConfluenceDataCenter.template.yaml, and CrowdDataCenter.template.yaml
-# As a rule, we should work to minimize our diffs between these files as best we can, so that future changes are easy to make across all supported CloudFormation templates.
-# Using YAML as our file format will allow us to put a block comment at the top of the file saying exactly this.
 AWSTemplateFormatVersion: 2010-09-09
-Description: Atlassian Confluence
+Description: Atlassian Confluence Data Center with VPC
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -206,7 +203,7 @@ Parameters:
     Type: String
   CatalinaOpts:
     Default: ''
-    Description: Pass in any additional JVM options to tune Catalina Tomcat
+    Description: Pass in any additional JVM options to tune Catalina Tomcat.
     Type: String
   CidrBlock:
     Default: '0.0.0.0/0'
@@ -321,7 +318,7 @@ Parameters:
     Type: Number
   ClusterNodeVolumeSize:
     Default: 50
-    Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4)
+    Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4).
     Type: Number
   CollaborativeEditingMode:
     Default: synchrony-separate-nodes
@@ -365,8 +362,8 @@ Parameters:
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
-    ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type
+    ConstraintDescription: Must be a valid RDS instance class from the list.
+    Description: RDS instance type.
     Type: String
   DBIops:
     Default: 1000
@@ -400,15 +397,15 @@ Parameters:
     Type: String
   DBPoolMaxSize:
     Default: 60
-    Description: The maximum number of database connections that can be opened at any time
+    Description: The maximum number of database connections that can be opened at any time.
     Type: String
   DBPoolMinSize:
     Default: 20
-    Description: The minimum number of idle database connections that are kept open at any time
+    Description: The minimum number of idle database connections that are kept open at any time.
     Type: String
   DBTimeout:
     Default: 30
-    Description: Number of seconds that Connections in excess of minPoolSize should be permitted to remain idle in the pool before being culled
+    Description: Number of seconds that Connections in excess of minPoolSize should be permitted to remain idle in the pool before being culled.
     Type: String
   DBIdleTestPeriod:
     Default: 100
@@ -420,26 +417,26 @@ Parameters:
     Type: String
   DBValidate:
     Default: false
-    Description: If true, a connection test will be performed at every connection checkout to verify that the connection is valid
+    Description: If true, a connection test will be performed at every connection checkout to verify that the connection is valid.
     Type: String
   DBPreferredTestQuery:
     Default: 'select version();'
-    Description: The query that will be executed for all connection tests
+    Description: The query that will be executed for all connection tests.
     Type: String
   DBAcquireIncrement:
     Default: 1
-    Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted
+    Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.
     Type: String
   DBStorage:
     Default: 10
-    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144
+    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144.
     Type: Number
   DBStorageEncrypted:
     Default: false
     AllowedValues:
       - true
       - false
-    Description: Whether or not to encrypt the database
+    Description: Whether or not to encrypt the database.
     Type: String
   DBStorageType:
     Default: General Purpose (SSD)
@@ -456,16 +453,16 @@ Parameters:
       - stg
       - dr
     ConstraintDescription: Must be either Production (prod), Staging (stg), or Disaster Recovery (dr).
-    Description: Environment of the application - either Production, Staging, or Disaster Recovery (DR)
+    Description: Environment of the application - either Production, Staging, or Disaster Recovery (DR).
     Type: String
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
-    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames.
     Type: String
   JvmHeapOverride:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
+    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g.
     Type: String
   JvmHeapOverrideSynchrony:
     Default: ''
@@ -474,7 +471,7 @@ Parameters:
   KeyName:
     Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances
+    Description: The EC2 Key Pair to allow SSH access to the instances.
     Type: String
   LocalAnsibleGitRepo:
     Default: ''
@@ -490,7 +487,7 @@ Parameters:
       - false
     ConstraintDescription: Must be 'true' or 'false'.
     Default: true
-    Description: Enable mail processing and sending
+    Description: Enable mail processing and sending.
     Type: String
   SubDomainName:
     Description: Leave this field blank to use your stack name as the sub-domain.
@@ -508,7 +505,7 @@ Parameters:
       - true
       - false
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Start the collectd service
+    Description: Start the collectd service.
     Type: String
   SynchronyClusterNodeMax:
     Default: 1
@@ -614,40 +611,40 @@ Parameters:
     Type: String
   TomcatAcceptCount:
     Default: 10
-    Description: The maximum queue length for incoming connection requests when all possible request processing threads are in use
+    Description: The maximum queue length for incoming connection requests when all possible request processing threads are in use.
     Type: String
   TomcatConnectionTimeout:
     Default: 20000
-    Description: The number of milliseconds this Connector will wait, after accepting a connection, for the request URI line to be presented
+    Description: The number of milliseconds this Connector will wait, after accepting a connection, for the request URI line to be presented.
     Type: String
   TomcatContextPath:
     Default: ''
     AllowedPattern: '^(\/[A-z_\-0-9\.]+)?$'
-    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/"
+    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/".
     Type: String
   TomcatDefaultConnectorPort:
     Default: 8080
-    Description: The port on which to serve the application
+    Description: The port on which to serve the application.
     Type: String
   TomcatEnableLookups:
     Default: false
-    Description: Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in order to return the actual host name of the remote client
+    Description: Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in order to return the actual host name of the remote client.
     Type: String
   TomcatMaxThreads:
     Default: 48
-    Description: The maximum number of request processing threads to be created by this Connector, which therefore determines the maximum number of simultaneous requests that can be handled
+    Description: The maximum number of request processing threads to be created by this Connector, which therefore determines the maximum number of simultaneous requests that can be handled.
     Type: String
   TomcatMinSpareThreads:
     Default: 10
-    Description: The minimum number of threads always kept running
+    Description: The minimum number of threads always kept running.
     Type: String
   TomcatProtocol:
     Default: 'HTTP/1.1'
-    Description: Sets the protocol to handle incoming traffic
+    Description: Sets the protocol to handle incoming traffic.
     Type: String
   TomcatRedirectPort:
     Default: 8443
-    Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI
+    Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI.
     Type: String
   TomcatScheme:
     Default: http
@@ -659,7 +656,7 @@ Parameters:
   AccessCIDR:
     Default: 0.0.0.0/0
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block allowed to access Atlassian Servcies
+    Description: CIDR Block allowed to access Atlassian Services.
     Type: String
   AvailabilityZones:
     Description: 'List of Availability Zones to use for the subnets in the VPC. Note: You must specify 2 AZs here; 
@@ -678,12 +675,12 @@ Parameters:
   PublicSubnet1CIDR:
     Default: 10.0.128.0/20
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
+    Description: CIDR Block for the public DMZ subnet 1 located in Availability Zone 1.
     Type: String
   PublicSubnet2CIDR:
     Default: 10.0.144.0/20
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
+    Description: CIDR Block for the public DMZ subnet 2 located in Availability Zone 2.
     Type: String
   QSS3BucketName:
     Default: 'atlassian-aws-resources'
@@ -707,7 +704,7 @@ Parameters:
   VPCCIDR:
     Default: 10.0.0.0/16
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the VPC
+    Description: CIDR Block for the VPC.
     Type: String
 
 Conditions:
@@ -808,30 +805,33 @@ Resources:
 
 Outputs:
   ServiceURL:
-    Description: The URL to access this Atlassian service
+    Description: The URL to access this Atlassian service.
     Value: !GetAtt 'ConfluenceStack.Outputs.ServiceURL'
   LoadBalancerURL:
-    Description: The Load Balancer URL
+    Description: The Load Balancer URL.
     Value: !GetAtt 'ConfluenceStack.Outputs.LoadBalancerURL'
+  BastionIP:
+    Description: Bastion node IP (use as a jumpbox to connect to the nodes).
+    Value: !GetAtt 'VPCStack.Outputs.BastionPubIp'
   SGname:
-    Description: The name of the SecurityGroup
+    Description: The name of the SecurityGroup.
     Value: !GetAtt 'ConfluenceStack.Outputs.SGname'
   DBEndpointAddress:
-    Description: The Database Connection String
+    Description: The Database Connection String.
     Value: !GetAtt 'ConfluenceStack.Outputs.DBEndpointAddress'
   DBEncryptionKey:
     Condition: UseDatabaseEncryption
-    Description: The alias of the encryption key created for RDS
+    Description: The alias of the encryption key created for RDS.
     Value: !GetAtt 'ConfluenceStack.Outputs.DBEncryptionKey'
   EFSCname:
-    Description: The cname of the EFS
+    Description: The cname of the EFS.
     Value: !GetAtt 'ConfluenceStack.Outputs.EFSCname'
   ConfluenceTargetGroupARN:
-    Description: The name of the load balancer of Confluence cluster nodes
+    Description: The name of the load balancer of Confluence cluster nodes.
     Value: !GetAtt 'ConfluenceStack.Outputs.ConfluenceTargetGroupARN'
   ClusterNodeGroup:
-    Description: The name of the auto scaling group of Confluence cluster nodes
+    Description: The name of the auto scaling group of Confluence cluster nodes.
     Value: !GetAtt 'ConfluenceStack.Outputs.ClusterNodeGroup'
   SynchronyClusterNodeGroup:
-    Description: The name of the auto scaling group of Synchrony cluster nodes
+    Description: The name of the auto scaling group of Synchrony cluster nodes.
     Value: !GetAtt 'ConfluenceStack.Outputs.SynchronyClusterNodeGroup'
