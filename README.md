@@ -1,20 +1,23 @@
-# quickstart-confluence
-Please send `PRs`,`issues` and `feature request` to the upstream repo here https://bitbucket.org/atlassian/atlassian-aws-deployment/src/c72c1496000de07d90ba2f98ad4309fe229ad19d/quickstarts/
-## Confluence Data Center on AWS Cloud
+# Atlassian Confluence Data Center Quick Start
 
-Use this Quick Start to deploy Confluence Data Center from Atlassian on the AWS Cloud in less than 30 minutes. Confluence is team collaboration software that changes how modern teams work. Confluence Data Center is a self-managed solution that gives you high availability, performance at scale, and disaster recovery for uninterrupted access to Confluence for all your teams.
+This repository contains quickstart templates that will create recommended
+Confluence Data center deployment in AWS.
 
-The Quick Start includes AWS CloudFormation templates that automatically deploy Confluence Data Center into a highly available, secure AWS Cloud environment. The Quick Start also includes a guide with step-by-step deployment and configuration instructions and best practices to help you get the most out of Confluence Data Center on the AWS Cloud.
+You can start easily following [documentation on AWS Quick Starts portal](https://aws.amazon.com/quickstart/architecture/confluence/).
 
-To build your Confluence Data Center cluster on AWS, follow the instructions in the deployment guide. The Quick Start automates the following:
+## Important
 
-- Deploying Confluence Data Center into a new VPC
-- Deploying Confluence Data Center into an existing VPC
+### Network prerequisites
 
-You can also use the Confluence Data Center templates as a starting point for your own implementation.
+Before running this template, you need to create the required AWS networking infrastructure
+(VPC, subnets) via [atlassian-quickstart-services](https://github.com/aws-quickstart/quickstart-atlassian-services).
+This is described in details in [documentation](https://aws.amazon.com/quickstart/architecture/confluence/)
+on the portal.
 
-![Quick Start architecture for Confluence Data Center on AWS Cloud](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/confluence-on-aws-architecture.png)
+### Contributing & issues
 
-For architectural details, best practices, step-by-step instructions, and customization options, see the [deployment guide](https://fwd.aws/kBpWN).
+Please note that issues are disabled for this repository as it is only a
+downstream repository that is not actively supported.
+Pull requests, issues and comments are welcomed in the upstream repository:
 
-To post feedback, submit feature ideas, or report bugs, use the Issues section of this GitHub repo. If you'd like to submit code for this Quick Start, please review the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/).
+**[Upstream repository link](https://bitbucket.org/atlassian/atlassian-aws-deployment/src/master/quickstarts/)**
