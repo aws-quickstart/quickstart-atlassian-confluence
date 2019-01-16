@@ -42,7 +42,7 @@ Metadata:
         Parameters:
           - AssociatePublicIpAddress
           - CidrBlock
-          - KeyName
+          - KeyPairName
           - SSLCertificateARN
       - Label:
           default: DNS (Optional)
@@ -148,7 +148,7 @@ Metadata:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
-      KeyName:
+      KeyPairName:
         default: Key Name *
       LocalAnsibleGitRepo:
         default: Git repo for local-ansible
@@ -464,7 +464,7 @@ Parameters:
     Default: ''
     Description: Override the default amount of memory to allocate to the JVM for Synchrony, for your instance type - set size in meg or gig e.g. 1024m or 1g.
     Type: String
-  KeyName:
+  KeyPairName:
     Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
@@ -659,7 +659,7 @@ Conditions:
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
   KeyProvided:
-    !Not [!Equals [!Ref KeyName, '']]
+    !Not [!Equals [!Ref KeyPairName, '']]
   SSLScheme:
     !Equals [!Ref TomcatScheme, 'https']
   OverrideHeap:
@@ -1259,7 +1259,7 @@ Resources:
         - DeviceName: /dev/xvdf
           Ebs: {}
           NoDevice: true
-      KeyName: !If [ KeyProvided, !Ref KeyName, !ImportValue ATL-DefaultKey ]
+      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -1511,7 +1511,7 @@ Resources:
         - DeviceName: /dev/xvdf
           Ebs: {}
           NoDevice: true
-      KeyName: !If [ KeyProvided, !Ref KeyName, !ImportValue ATL-DefaultKey ]
+      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap

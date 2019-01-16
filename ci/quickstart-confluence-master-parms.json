@@ -40,7 +40,7 @@
         "ParameterValue":"quickstart-atlassian-confluence/"
     },
     {
-        "ParameterKey": "KeyName",
+        "ParameterKey": "KeyPairName",
         "ParameterValue": "replaced-by-taskcat-override-file"
     }
 ]
