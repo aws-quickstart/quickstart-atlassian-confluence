@@ -1,9 +1,6 @@
 ---
-# Bring up diffs between this file and the BitbucketDataCenter.template, and JiraDataCenter.template.
-# As a rule, we should work to minimize our diffs between these files as best we can, so that future changes are easy to make across all supported CloudFormation templates.
-# Using YAML as our file format will allow us to put a block comment at the top of the file saying exactly this.
 AWSTemplateFormatVersion: 2010-09-09
-Description: Atlassian Confluence Data Center
+Description: Atlassian Confluence Data Center QS(5027)
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
