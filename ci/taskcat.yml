@@ -22,5 +22,3 @@ tests:
     template_file: quickstart-confluence-master-with-vpc.template.yaml
     regions:
      - ap-southeast-2
-     # - eu-west-1
-     # - us-west-2
