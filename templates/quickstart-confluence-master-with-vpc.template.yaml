@@ -86,7 +86,10 @@ Metadata:
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
+
     ParameterLabels:
+      AccessCIDR:
+        default: Trusted IP range
       AssociatePublicIpAddress:
         default: Assign public IP
       AvailabilityZones:
@@ -159,6 +162,14 @@ Metadata:
         default: Git SSH key name for local-ansible
       MailEnabled:
         default: Enable App to Process Email
+      PrivateSubnet1CIDR:
+        default: AZ1 private IP address block
+      PrivateSubnet2CIDR:
+        default: AZ2 private IP address block
+      PublicSubnet1CIDR:
+        default: AZ1 public IP address block        
+      PublicSubnet2CIDR:
+        default: AZ2 public IP address block
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
@@ -193,6 +204,8 @@ Metadata:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
+      VPCCIDR:
+        default: IP address block for the VPC
 
 Parameters:
   AssociatePublicIpAddress:
@@ -309,6 +322,7 @@ Parameters:
     Description: Instance type for the cluster application nodes (note - for "synchrony-local" collaborative editing you must chose an instance size with over 5 GB RAM).
     Type: String
   ClusterNodeMax:
+    Description: Maximum number of nodes in the cluster.
     Default: 1
     Type: Number
   ClusterNodeMin:
@@ -380,6 +394,7 @@ Parameters:
     NoEcho: true
     Type: String
   DBMultiAZ:
+    Description: Whether to provision a multi-AZ RDS instance.
     Default: true
     AllowedValues:
       - true
@@ -507,9 +522,11 @@ Parameters:
     Description: Start the collectd service.
     Type: String
   SynchronyClusterNodeMax:
+    Description: Maximum number of Synchrony cluster nodes
     Default: 1
     Type: Number
   SynchronyClusterNodeMin:
+    Description: Minimum number of Synchrony cluster nodes
     Default: 1
     Type: Number
   SynchronyNodeInstanceType:

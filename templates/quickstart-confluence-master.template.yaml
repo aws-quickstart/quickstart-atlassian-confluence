@@ -80,6 +80,7 @@ Metadata:
           - TomcatProtocol
           - TomcatRedirectPort
           - TomcatScheme
+
     ParameterLabels:
       AssociatePublicIpAddress:
         default: Assign public IP
@@ -183,6 +184,7 @@ Metadata:
         default: Tomcat Redirect Port
       TomcatScheme:
         default: Tomcat protocol Scheme
+
 Parameters:
   AssociatePublicIpAddress:
     Default: true
@@ -302,6 +304,7 @@ Parameters:
     Description: Instance type for the cluster application nodes (note - for "synchrony-local" collaborative editing you must chose an instance size with over 5 GB RAM).
     Type: String
   ClusterNodeMax:
+    Description: Maximum number of nodes in the cluster.
     Default: 1
     Type: Number
   ClusterNodeMin:
@@ -373,6 +376,7 @@ Parameters:
     NoEcho: true
     Type: String
   DBMultiAZ:
+    Description: Whether to provision a multi-AZ RDS instance.
     Default: true
     AllowedValues:
       - true
@@ -405,7 +409,7 @@ Parameters:
     Type: String
   DBMaxStatements:
     Default: 0
-    Description: The size of c3p0's global PreparedStatement cache. It controls the total number of Statements cached, for all Connections. If set, it should be a fairly large number, as each pooled Connection requires its own, distinct flock of cached statements.
+    Description: "The size of c3p0's global PreparedStatement cache. It controls the total number of Statements cached, for all Connections. If set, it should be a fairly large number, as each pooled Connection requires its own, distinct flock of cached statements."
     Type: String
   DBValidate:
     Default: false
@@ -500,9 +504,11 @@ Parameters:
     Description: Start the collectd service
     Type: String
   SynchronyClusterNodeMax:
+    Description: Maximum number of Synchrony cluster nodes
     Default: 1
     Type: Number
   SynchronyClusterNodeMin:
+    Description: Minimum number of Synchrony cluster nodes
     Default: 1
     Type: Number
   SynchronyNodeInstanceType:
@@ -640,7 +646,7 @@ Parameters:
     Type: String
   TomcatScheme:
     Default: http
-    Description: The name of the protocol you wish to have returned, ie "https" for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately.
+    Description: "The name of the protocol you wish to have returned, ie 'https' for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately."
     Type: String
     AllowedValues: [http, https]
 Conditions:
