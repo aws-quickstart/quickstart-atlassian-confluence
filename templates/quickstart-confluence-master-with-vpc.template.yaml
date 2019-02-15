@@ -347,9 +347,9 @@ Parameters:
     Type: String
     ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
   ConfluenceVersion:
-    Default: '6.14.0'
+    Default: '6.13.2'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
-    ConstraintDescription: "Must be a valid Confluence version number, for example 6.14.0. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
+    ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
     Type: String
   CustomDnsName:
