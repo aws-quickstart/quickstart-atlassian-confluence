@@ -1,23 +1,27 @@
-# Atlassian Confluence Data Center Quick Start
+# quickstart-atlassian-confluence
+## Confluence Data Center on the AWS Cloud
 
-This repository contains quickstart templates that will create recommended
-Confluence Data center deployment in AWS.
+Use this Quick Start to deploy Confluence Data Center on the AWS Cloud.
 
-You can start easily following [documentation on AWS Quick Starts portal](https://aws.amazon.com/quickstart/architecture/confluence/).
+Confluence is team collaboration software that changes how modern teams work. Confluence Data Center is a self-managed solution that gives you high availability, performance at scale, and disaster recovery for uninterrupted access to Confluence for all your teams.
 
-## Important
+This Quick Start uses the [Atlassian Standard Infrastructure (ASI)](https://fwd.aws/xYyYy) as a foundation. You can choose to build a new ASI for your deployment or deploy Jira into your existing ASI. You can also deploy Jira and Bitbucket Data Center within the same ASI.
+
+![Quick Start architecture for Confluence on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/confluence-on-aws-architecture.png)
+
+For architectural details, best practices, step-by-step instructions, and customization options, see the 
+[deployment guide](https://fwd.aws/kBpWN).
 
 ### Network prerequisites
 
-Before running this template, you need to create the required AWS networking infrastructure
-(VPC, subnets) via [atlassian-quickstart-services](https://github.com/aws-quickstart/quickstart-atlassian-services).
-This is described in details in [documentation](https://aws.amazon.com/quickstart/architecture/confluence/)
-on the portal.
+You need to create the required AWS networking infrastructure
+(VPC, subnets) by using the [ASI Quick Start](https://fwd.aws/xYyYy), or by deploying Jira with a new ASI.
+For details, see the [deployment guide](https://fwd.aws/kBpWN).
 
 ### Contributing & issues
 
-Please note that issues are disabled for this repository as it is only a
+Please note that issues are disabled for this repository, because it is a
 downstream repository that is not actively supported.
-Pull requests, issues and comments are welcomed in the upstream repository:
+We welcome pull requests, issues, and comments in the **[upstream repository](https://bitbucket.org/atlassian/atlassian-aws-deployment/src/master/quickstarts/)**.
 
-**[Upstream repository link](https://bitbucket.org/atlassian/atlassian-aws-deployment/src/master/quickstarts/)**
+If you'd like to submit code for this Quick Start, please review the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/). 
