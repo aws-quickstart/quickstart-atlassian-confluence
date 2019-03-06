@@ -1397,7 +1397,7 @@ Resources:
                     - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
                     - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]]
                     - !Sub ["ATL_SYNCHRONY_MEMORY=-Xmx${AtlJvmHeapSynchrony}", AtlJvmHeapSynchrony: !If [OverrideHeapSynchrony, !Ref 'JvmHeapOverrideSynchrony', '2g']]
-                    - !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname,  !Sub ["${HTTP}://${LoadBalancerDNSName}", {HTTP: !If [SSLScheme, 'https', 'http'], LoadBalancerDNSName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]}]]]}]
+                    - !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]]}]
                     - "ATL_APP_DATA_MOUNT_ENABLED=false"
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
                     - "ATL_DB_NAME=confluence"
