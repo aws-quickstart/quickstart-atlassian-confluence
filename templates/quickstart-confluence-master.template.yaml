@@ -26,6 +26,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
+          - DBClustered
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -80,6 +81,11 @@ Metadata:
           - TomcatProtocol
           - TomcatRedirectPort
           - TomcatScheme
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
 
     ParameterLabels:
       AssociatePublicIpAddress:
@@ -110,6 +116,8 @@ Metadata:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
+      DBClustered:
+        default: Database clustering on
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -184,6 +192,10 @@ Metadata:
         default: Tomcat Redirect Port
       TomcatScheme:
         default: Tomcat protocol Scheme
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
 
 Parameters:
   AssociatePublicIpAddress:
@@ -337,6 +349,14 @@ Parameters:
   CustomDnsName:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
+    Type: String
+  DBClustered:
+    Default: false
+    Description: 'Run postgres in a cluster using Amazon Aurora'
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBInstanceClass:
     Default: db.t2.medium
@@ -649,15 +669,31 @@ Parameters:
     Description: "The name of the protocol you wish to have returned, ie 'https' for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately."
     Type: String
     AllowedValues: [http, https]
+  QSS3BucketName:
+    Default: 'aws-quickstart'
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name
+      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
+      It cannot start or end with a hyphen (-).
+    Type: String
+  QSS3KeyPrefix:
+    Default: 'quickstart-atlassian-confluence/'
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slash (/).
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/).
+    Type: String
+
 Conditions:
-  DBProvisionedIops:
-    !Equals [!Ref DBStorageType, Provisioned IOPS]
   DisableMail:
     !Not [!Equals [!Ref MailEnabled, true]]
   DoCollectd:
     !Equals [!Ref StartCollectd, true]
-  DoSetDBMasterUserPassword:
-    !Not [!Equals [!Ref DBMasterUserPassword, '']]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
   KeyProvided:
@@ -668,16 +704,20 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
+  UseAurora:
+    !Equals [!Ref DBClustered, true]
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
     !Not [!Equals [!Ref CustomDnsName, '']]
   UseDatabaseEncryption:
-    !Equals [!Ref DBStorageEncrypted, true]
+    !Equals [!Ref DBStorageEncrypted , true]
   UseHostedZone:
     !Not [!Equals [!Ref HostedZone, '']]
   UsePublicIp:
     !Equals [!Ref AssociatePublicIpAddress, 'true']
+  UsePostgres:
+    !Equals [!Ref DBClustered, false]
   UseSubDomainName:
     !Not [!Equals [!Ref SubDomainName, '']]
   UseSynchronyAutoScalingGroup:
@@ -1111,13 +1151,13 @@ Resources:
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !Sub ["ATL_DB_ACQUIREINCREMENT=${DBAcquireIncrement}", DBAcquireIncrement: !Ref DBAcquireIncrement]
-                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress]
                     - !Sub ["ATL_DB_IDLETESTPERIOD=${DBIdleTestPeriod}", DBIdleTestPeriod: !Ref DBIdleTestPeriod]
                     - !Sub ["ATL_DB_MAXSTATEMENTS=${DBMaxStatements}", DBMaxStatements: !Ref DBMaxStatements]
                     - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
                     - !Sub ["ATL_DB_POOLMAXSIZE=${DBPoolMaxSize}", DBPoolMaxSize: !Ref DBPoolMaxSize]
                     - !Sub ["ATL_DB_POOLMINSIZE=${DBPoolMinSize}", DBPoolMinSize: !Ref DBPoolMinSize]
-                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort]
                     - !Sub ["ATL_DB_PREFERREDTESTQUERY=\"${DBPreferredTestQuery}\"", DBPreferredTestQuery: !Ref DBPreferredTestQuery]
                     - !Sub ["ATL_DB_TIMEOUT=${DBTimeout}", DBTimeout: !Ref DBTimeout]
                     - !Sub ["ATL_DB_VALIDATE=${DBValidate}", DBValidate: !Ref DBValidate]
@@ -1127,7 +1167,7 @@ Resources:
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
                     - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
                     - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress, DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort }]
                     - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
                     - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
                     - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
@@ -1386,15 +1426,15 @@ Resources:
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
-                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress]
                     - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
                     - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
                     - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress, DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort }]
                     - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
                     - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
                     - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
@@ -1621,30 +1661,29 @@ Resources:
         - !Join ['.', [!Ref ElasticFileSystem, 'efs', !Ref 'AWS::Region', 'amazonaws.com.']]
 # Database
   DB:
-    Type: AWS::RDS::DBInstance
+    Type: AWS::CloudFormation::Stack
+    Condition: UsePostgres
     Properties:
-      AllocatedStorage: !Ref DBStorage
-      DBInstanceClass: !Ref DBInstanceClass
-      DBInstanceIdentifier: !Ref AWS::StackName
-      DBSubnetGroupName: !Ref DBSubnetGroup
-      Engine: postgres
-      EngineVersion: 9.6
-      Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref 'AWS::NoValue']
-      KmsKeyId: !If [UseDatabaseEncryption, !GetAtt EncryptionKey.Arn, !Ref 'AWS::NoValue']
-      MasterUsername: postgres
-      MasterUserPassword: !If [DoSetDBMasterUserPassword, !Ref DBMasterUserPassword, !Ref 'AWS::NoValue']
-      MultiAZ: !Ref DBMultiAZ
-      StorageEncrypted: !If [UseDatabaseEncryption, !Ref DBStorageEncrypted, !Ref 'AWS::NoValue']
-      StorageType: !If [DBProvisionedIops, io1, gp2]
-      Tags:
-        - Key: Name
-          Value: !Sub ["${StackName} Confluence PostgreSQL Database", StackName: !Ref 'AWS::StackName']
-      VPCSecurityGroups: [!Ref SecurityGroup]
-  DBSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: DBSubnetGroup
-      SubnetIds: !Split [ ",", !ImportValue ATL-PriNets]
+      TemplateURL: !Sub
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-postgres/templates/quickstart-atlassian-postgres.yaml
+        - QSS3Region: !If
+            - GovCloudCondition
+            - s3-us-gov-west-1
+            - s3
+      Parameters:
+        DBInstanceClass: !Ref DBInstanceClass
+        DBIops: !Ref DBIops
+        DBMasterUserPassword: !Ref DBMasterUserPassword
+        DBMultiAZ: !Ref DBMultiAZ
+        DBStorage: !Ref DBStorage
+        DBStorageEncrypted: !Ref DBStorageEncrypted
+        DBStorageType: !Ref DBStorageType
+        DBSecurityGroup: !Ref SecurityGroup
+
+  # DBAurora:
+  #   Type: AWS::RDS::DBCluster
+  #   Condition: UseAurora
+
   DBCname:
     Condition: UseHostedZone
     Type: AWS::Route53::RecordSet
@@ -1655,7 +1694,7 @@ Resources:
       Type: CNAME
       TTL: 900
       ResourceRecords:
-        - !GetAtt DB.Endpoint.Address
+        - !GetAtt DB.Outputs.DBEndpointAddress
 # Loadbalancer
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -1807,30 +1846,7 @@ Resources:
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
-  EncryptionKey:
-    Condition: UseDatabaseEncryption
-    DeletionPolicy: Retain
-    Type: AWS::KMS::Key
-    Properties:
-      KeyPolicy:
-        Version: 2012-10-17
-        Id: !Sub "${AWS::StackName}"
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS:
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
-            Action: 'kms:*'
-            Resource: '*'
-      Tags:
-        - Key: Name
-          Value: !Sub ["${StackName} Encryption Key", StackName: !Ref 'AWS::StackName']
-  EncryptionKeyAlias:
-    Condition: UseDatabaseEncryption
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: !Sub "alias/${AWS::StackName}"
-      TargetKeyId: !Ref EncryptionKey
+
 Outputs:
   ServiceURL:
     Description: The URL to access this Atlassian service
@@ -1867,11 +1883,11 @@ Outputs:
       }
   DBEndpointAddress:
     Description: The Database Connection String
-    Value: !GetAtt DB.Endpoint.Address
+    Value: !GetAtt DB.Outputs.DBEndpointAddress
   DBEncryptionKey:
     Condition: UseDatabaseEncryption
     Description: The alias of the encryption key created for RDS
-    Value: !Ref EncryptionKeyAlias
+    Value: !GetAtt DB.Outputs.DBEncryptionKey
   EFSCname:
     Description: The cname of the EFS
     Value: !If
