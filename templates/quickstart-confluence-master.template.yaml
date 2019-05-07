@@ -26,7 +26,6 @@ Metadata:
       - Label:
           default: Database
         Parameters:
-#          - DBClustered
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -116,8 +115,6 @@ Metadata:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
-      # DBClustered:
-      #   default: Whether Database Clustering is Enabled
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -350,14 +347,6 @@ Parameters:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
-  # DBClustered:
-  #   Default: false
-  #   Description: 'Run PostgreSQL in a cluster using Amazon Aurora'
-  #   AllowedValues:
-  #     - true
-  #     - false
-    # ConstraintDescription: Must be 'true' or 'false'.
-    # Type: String
   DBInstanceClass:
     Default: db.t2.medium
     AllowedValues:
@@ -704,8 +693,6 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
-  # UseAurora:
-  #   !Equals [!Ref DBClustered, true]
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
@@ -1661,7 +1648,6 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-postgres/templates/quickstart-atlassian-postgres.yaml
-        #- DBEngine: !If ["UseAurora", "aurora", "postgres"]
         -  QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
       Parameters:
         DBInstanceClass: !Ref DBInstanceClass
