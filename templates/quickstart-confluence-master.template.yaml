@@ -26,7 +26,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
-          - DBClustered
+#          - DBClustered
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -116,8 +116,8 @@ Metadata:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
-      DBClustered:
-        default: Database clustering on
+      # DBClustered:
+      #   default: Whether Database Clustering is Enabled
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -350,14 +350,14 @@ Parameters:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
-  DBClustered:
-    Default: false
-    Description: 'Run postgres in a cluster using Amazon Aurora'
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: Must be 'true' or 'false'.
-    Type: String
+  # DBClustered:
+  #   Default: false
+  #   Description: 'Run PostgreSQL in a cluster using Amazon Aurora'
+  #   AllowedValues:
+  #     - true
+  #     - false
+    # ConstraintDescription: Must be 'true' or 'false'.
+    # Type: String
   DBInstanceClass:
     Default: db.t2.medium
     AllowedValues:
@@ -377,7 +377,7 @@ Parameters:
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
-    ConstraintDescription: Must be a valid RDS instance class from the list
+    ConstraintDescription: Must be a valid RDS instance class from the list (must be r4 family if using Aurora)
     Description: RDS instance type
     Type: String
   DBIops:
@@ -704,20 +704,16 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
-  UseAurora:
-    !Equals [!Ref DBClustered, true]
+  # UseAurora:
+  #   !Equals [!Ref DBClustered, true]
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
     !Not [!Equals [!Ref CustomDnsName, '']]
-  UseDatabaseEncryption:
-    !Equals [!Ref DBStorageEncrypted , true]
   UseHostedZone:
     !Not [!Equals [!Ref HostedZone, '']]
   UsePublicIp:
     !Equals [!Ref AssociatePublicIpAddress, 'true']
-  UsePostgres:
-    !Equals [!Ref DBClustered, false]
   UseSubDomainName:
     !Not [!Equals [!Ref SubDomainName, '']]
   UseSynchronyAutoScalingGroup:
@@ -1662,14 +1658,11 @@ Resources:
 # Database
   DB:
     Type: AWS::CloudFormation::Stack
-    Condition: UsePostgres
     Properties:
       TemplateURL: !Sub
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-postgres/templates/quickstart-atlassian-postgres.yaml
-        - QSS3Region: !If
-            - GovCloudCondition
-            - s3-us-gov-west-1
-            - s3
+        #- DBEngine: !If ["UseAurora", "aurora", "postgres"]
+        -  QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
       Parameters:
         DBInstanceClass: !Ref DBInstanceClass
         DBIops: !Ref DBIops
@@ -1679,11 +1672,6 @@ Resources:
         DBStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !Ref DBStorageType
         DBSecurityGroup: !Ref SecurityGroup
-
-  # DBAurora:
-  #   Type: AWS::RDS::DBCluster
-  #   Condition: UseAurora
-
   DBCname:
     Condition: UseHostedZone
     Type: AWS::Route53::RecordSet
@@ -1884,10 +1872,6 @@ Outputs:
   DBEndpointAddress:
     Description: The Database Connection String
     Value: !GetAtt DB.Outputs.DBEndpointAddress
-  DBEncryptionKey:
-    Condition: UseDatabaseEncryption
-    Description: The alias of the encryption key created for RDS
-    Value: !GetAtt DB.Outputs.DBEncryptionKey
   EFSCname:
     Description: The cname of the EFS
     Value: !If

@@ -1,46 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: RDS Postgres Database for use in Atlassian Standard Infrastructure
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: Configuration
-        Parameters:
-          - DBInstanceClass
-          - DBIops
-          - DBMasterUserPassword
-          - DBMultiAZ
-          - DBStorage
-          - DBStorageEncrypted
-          - DBStorageType
-          - DBSecurityGroup
-      - Label:
-          default: Management
-        Parameters:
-          - HostedZone
-          
-
-    ParameterLabels:
-      DBInstanceClass:
-        default: Database instance class
-      DBIops:
-        default: RDS Provisioned IOPS
-      DBMasterUserPassword:
-        default: Master (admin) password *
-      DBMultiAZ:
-        default: Enable RDS Multi-AZ deployment
-      DBStorage:
-        default: Database storage
-      DBStorageEncrypted:
-        default: Database encryption
-      DBStorageType:
-        default: Database storage type
-      DBSecurityGroup:
-        default: VPC security group(s) to apply to the database
-      HostedZone:
-        default: Route 53 Hosted Zone (optional)
-
 Parameters:
   DBInstanceClass:
     Default: db.t2.medium
@@ -106,14 +66,9 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
     Type: String
-  DBSecurityGroup:
+  DBSecurityGroups:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: The security groups to apply to the database
-  HostedZone:
-    Default: ''
-    ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
-    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
-    Type: String
 
 Conditions:
   DBProvisionedIops:
@@ -122,30 +77,8 @@ Conditions:
     !Not [!Equals [!Ref DBMasterUserPassword, '']]
   UseDatabaseEncryption:
     !Equals [!Ref DBStorageEncrypted, true]
-  UseHostedZone:
-    !Not [!Equals [!Ref HostedZone, '']]
 
 Resources:
-  DB:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      AllocatedStorage: !Ref DBStorage
-      DBInstanceClass: !Ref DBInstanceClass
-      DBInstanceIdentifier: !Ref AWS::StackName
-      DBSubnetGroupName: !Ref DBSubnetGroup
-      Engine: postgres
-      EngineVersion: '9.6'
-      Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref 'AWS::NoValue']
-      KmsKeyId: !If [UseDatabaseEncryption, !GetAtt EncryptionKey.Arn, !Ref 'AWS::NoValue']
-      MasterUsername: postgres
-      MasterUserPassword: !If [DoSetDBMasterUserPassword, !Ref DBMasterUserPassword, !Ref 'AWS::NoValue']
-      MultiAZ: !Ref DBMultiAZ
-      StorageEncrypted: !If [UseDatabaseEncryption, !Ref DBStorageEncrypted, !Ref 'AWS::NoValue']
-      StorageType: !If [DBProvisionedIops, io1, gp2]
-      Tags:
-        - Key: Name
-          Value: !Sub ["${StackName} Confluence PostgreSQL Database", StackName: !Ref 'AWS::StackName']
-      VPCSecurityGroups: !Ref DBSecurityGroup
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -175,6 +108,26 @@ Resources:
     Properties:
       AliasName: !Sub "alias/${AWS::StackName}"
       TargetKeyId: !Ref EncryptionKey
+  DB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: !Ref DBStorage
+      DBInstanceClass: !Ref DBInstanceClass
+      DBInstanceIdentifier: !Ref AWS::StackName
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: postgres
+      EngineVersion: '9.6'
+      Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref 'AWS::NoValue']
+      KmsKeyId: !If [UseDatabaseEncryption, !GetAtt EncryptionKey.Arn, !Ref 'AWS::NoValue']
+      MasterUsername: postgres
+      MasterUserPassword: !If [DoSetDBMasterUserPassword, !Ref DBMasterUserPassword, !Ref 'AWS::NoValue']
+      MultiAZ: !Ref DBMultiAZ
+      StorageEncrypted: !If [UseDatabaseEncryption, !Ref DBStorageEncrypted, !Ref 'AWS::NoValue']
+      StorageType: !If [DBProvisionedIops, io1, gp2]
+      Tags:
+        - Key: Name
+          Value: !Sub ["${StackName} Confluence PostgreSQL Database", StackName: !Ref 'AWS::StackName']
+      VPCSecurityGroups: !Ref DBSecurityGroups
 
 Outputs:
   DBEndpointAddress:
