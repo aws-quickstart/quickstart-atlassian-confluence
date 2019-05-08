@@ -26,7 +26,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
-         - DBClustered
+          - DBClustered
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -1672,7 +1672,7 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBPort: '5432'
         DBAllocatedStorage: !Ref DBStorage
-        DBStorageEncrypted: !Ref DBStorageEncrypted
+        DBAllocatedStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !Ref DBStorageType
         CustomDBSecurityGroup: !Ref SecurityGroup
         Subnet1ID: !Select [0, !Split [ ",", !ImportValue ATL-PriNets]]
