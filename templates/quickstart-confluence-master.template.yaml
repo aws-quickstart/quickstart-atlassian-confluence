@@ -1149,13 +1149,13 @@ Resources:
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !Sub ["ATL_DB_ACQUIREINCREMENT=${DBAcquireIncrement}", DBAcquireIncrement: !Ref DBAcquireIncrement]
-                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress]
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress]
                     - !Sub ["ATL_DB_IDLETESTPERIOD=${DBIdleTestPeriod}", DBIdleTestPeriod: !Ref DBIdleTestPeriod]
                     - !Sub ["ATL_DB_MAXSTATEMENTS=${DBMaxStatements}", DBMaxStatements: !Ref DBMaxStatements]
                     - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
                     - !Sub ["ATL_DB_POOLMAXSIZE=${DBPoolMaxSize}", DBPoolMaxSize: !Ref DBPoolMaxSize]
                     - !Sub ["ATL_DB_POOLMINSIZE=${DBPoolMinSize}", DBPoolMinSize: !Ref DBPoolMinSize]
-                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.RDSEndPointPort]
                     - !Sub ["ATL_DB_PREFERREDTESTQUERY=\"${DBPreferredTestQuery}\"", DBPreferredTestQuery: !Ref DBPreferredTestQuery]
                     - !Sub ["ATL_DB_TIMEOUT=${DBTimeout}", DBTimeout: !Ref DBTimeout]
                     - !Sub ["ATL_DB_VALIDATE=${DBValidate}", DBValidate: !Ref DBValidate]
@@ -1165,7 +1165,7 @@ Resources:
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
                     - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
                     - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress, DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort }]
+                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress, DBEndpointPort: !GetAtt DB.Outputs.RDSEndPointPort }]
                     - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
                     - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
                     - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
@@ -1424,15 +1424,15 @@ Resources:
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
                     - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
-                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress]
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress]
                     - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.RDSEndPointPort]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
                     - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
                     - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.DBEndpointAddress, DBEndpointPort: !GetAtt DB.Outputs.DBEndpointPort }]
+                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress, DBEndpointPort: !GetAtt DB.Outputs.RDSEndPointPort }]
                     - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
                     - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
                     - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
@@ -1690,7 +1690,7 @@ Resources:
       Type: CNAME
       TTL: 900
       ResourceRecords:
-        - !GetAtt DB.Outputs.DBEndpointAddress
+        - !GetAtt DB.Outputs.RDSEndPointAddress
 # Loadbalancer
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -1879,7 +1879,7 @@ Outputs:
       }
   DBEndpointAddress:
     Description: The Database Connection String
-    Value: !GetAtt DB.Outputs.DBEndpointAddress
+    Value: !GetAtt DB.Outputs.RDSEndPointAddress
   EFSCname:
     Description: The cname of the EFS
     Value: !If
