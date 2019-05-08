@@ -720,6 +720,8 @@ Conditions:
     !Equals [!Ref CollaborativeEditingMode, 'synchrony-separate-nodes']
   GovCloudCondition:
     !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
+  DBProvisionedIops:
+    !Equals [!Ref DBStorageType, Provisioned IOPS]
 Mappings:
   AWSInstanceType2Arch:
     c4.xlarge:
@@ -1673,7 +1675,7 @@ Resources:
         DBPort: '5432'
         DBAllocatedStorage: !Ref DBStorage
         DBAllocatedStorageEncrypted: !Ref DBStorageEncrypted
-        DBStorageType: !Ref DBStorageType
+        DBStorageType: !If [DBProvisionedIops, io1, gp2]
         CustomDBSecurityGroup: !Ref SecurityGroup
         Subnet1ID: !Select [0, !Split [ ",", !ImportValue ATL-PriNets]]
         Subnet2ID: !Select [1, !Split [ ",", !ImportValue ATL-PriNets]]
