@@ -26,7 +26,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
-#          - DBClustered
+         - DBClustered
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -116,8 +116,8 @@ Metadata:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
-      # DBClustered:
-      #   default: Whether Database Clustering is Enabled
+      DBClustered:
+        default: Whether Database Clustering is Enabled
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -350,14 +350,14 @@ Parameters:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
-  # DBClustered:
-  #   Default: false
-  #   Description: 'Run PostgreSQL in a cluster using Amazon Aurora'
-  #   AllowedValues:
-  #     - true
-  #     - false
-    # ConstraintDescription: Must be 'true' or 'false'.
-    # Type: String
+  DBClustered:
+    Default: false
+    Description: 'Run PostgreSQL in a cluster using Amazon Aurora'
+    AllowedValues:
+      - true
+      - false
+    ConstraintDescription: Must be 'true' or 'false'.
+    Type: String
   DBInstanceClass:
     Default: db.t2.medium
     AllowedValues:
@@ -704,8 +704,8 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
-  # UseAurora:
-  #   !Equals [!Ref DBClustered, true]
+  UseAurora:
+    !Equals [!Ref DBClustered, true]
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
@@ -1660,18 +1660,23 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-postgres/templates/quickstart-atlassian-postgres.yaml
-        #- DBEngine: !If ["UseAurora", "aurora", "postgres"]
-        -  QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/${DatabaseTemplate}
+        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+          DatabaseTemplate: !If ["UseAurora", "quickstart-aws-aurora-postgresql/templates/aurora_postgres.yaml", "quickstart-atlassian-postgres/templates/atlassian_postgres.yaml"]
       Parameters:
+        DBBackupRetentionPeriod: "1"
         DBInstanceClass: !Ref DBInstanceClass
         DBIops: !Ref DBIops
+        DBMasterUsername: postgres
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
-        DBStorage: !Ref DBStorage
+        DBPort: '5432'
+        DBAllocatedStorage: !Ref DBStorage
         DBStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !Ref DBStorageType
-        DBSecurityGroup: !Ref SecurityGroup
+        Subnet1ID: !Select [0, !Split [ ",", !ImportValue ATL-PriNets]]
+        Subnet2ID: !Select [1, !Split [ ",", !ImportValue ATL-PriNets]]
+        VPCID: !ImportValue ATL-VPCID
   DBCname:
     Condition: UseHostedZone
     Type: AWS::Route53::RecordSet
