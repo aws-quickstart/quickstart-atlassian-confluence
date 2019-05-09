@@ -1679,6 +1679,8 @@ Resources:
         CustomDBSecurityGroup: !Ref SecurityGroup
         Subnet1ID: !Select [0, !Split [ ",", !ImportValue ATL-PriNets]]
         Subnet2ID: !Select [1, !Split [ ",", !ImportValue ATL-PriNets]]
+        # NB: The VPCID parameter is not actually used by any of the sub-templates but is a required parameter.
+        # It is used to create a security group if no security group is provided but we provide one.
         VPCID: !ImportValue ATL-VPCID
   DBCname:
     Condition: UseHostedZone
