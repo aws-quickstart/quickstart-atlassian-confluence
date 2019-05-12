@@ -1330,14 +1330,14 @@ Resources:
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref ClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: 1
   ClusterNodeScaleDownPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref ClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: -1
   CPUAlarmHigh:
     Type: AWS::CloudWatch::Alarm
@@ -1583,7 +1583,7 @@ Resources:
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref SynchronyClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: 1
   SynchronyClusterNodeScaleDownPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
@@ -1591,7 +1591,7 @@ Resources:
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref SynchronyClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: -1
   SynchronyCPUAlarmHigh:
     Type: AWS::CloudWatch::Alarm
@@ -1654,7 +1654,7 @@ Resources:
       Comment: Route53 cname for the efs
       Name: !If [ UseHostedZone, !Join ['.', [!Ref 'AWS::StackName', 'efs', !Ref 'HostedZone']], '']
       Type: CNAME
-      TTL: 900
+      TTL: '900'
       ResourceRecords:
         - !Join ['.', [!Ref ElasticFileSystem, 'efs', !Ref 'AWS::Region', 'amazonaws.com.']]
 # Database
@@ -1690,7 +1690,7 @@ Resources:
       Comment: Route53 cname for the RDS
       Name: !Join ['.', [!Ref 'AWS::StackName', 'db', !Ref 'HostedZone']]
       Type: CNAME
-      TTL: 900
+      TTL: '900'
       ResourceRecords:
         - !GetAtt DB.Outputs.RDSEndPointAddress
 # Loadbalancer
@@ -1699,7 +1699,7 @@ Resources:
     Properties:
       LoadBalancerAttributes:
         - Key: idle_timeout.timeout_seconds
-          Value: 300
+          Value: '300'
       Scheme: !If [UsePublicIp, 'internet-facing', 'internal']
       SecurityGroups: [!Ref SecurityGroup]
       Subnets: !Split [ ",", !ImportValue ATL-PubNets]
@@ -1734,7 +1734,7 @@ Resources:
         - SubDomainName: !If [UseSubDomainName, !Ref 'SubDomainName', !Ref 'AWS::StackName']
           HostedZone: !Ref 'HostedZone'
       Type: CNAME
-      TTL: 900
+      TTL: '900'
       ResourceRecords:
         - !GetAtt LoadBalancer.DNSName
   SynchronyListenerRule:
@@ -1760,13 +1760,13 @@ Resources:
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 2
       Matcher:
-        HttpCode: 200
+        HttpCode: '200'
       HealthCheckPath: !If [UseContextPath, !Join ['', [!Ref 'TomcatContextPath', '/status']], '/status']
       HealthCheckPort: !Ref TomcatDefaultConnectorPort
       HealthCheckProtocol: HTTP
       TargetGroupAttributes:
         - Key: stickiness.enabled
-          Value: true
+          Value: 'true'
         - Key: stickiness.type
           Value: lb_cookie
       Tags:
@@ -1787,13 +1787,13 @@ Resources:
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 2
       Matcher:
-        HttpCode: 200
+        HttpCode: '200'
       HealthCheckPath: /synchrony/heartbeat
-      HealthCheckPort: 8091
+      HealthCheckPort: '8091'
       HealthCheckProtocol: HTTP
       TargetGroupAttributes:
         - Key: stickiness.enabled
-          Value: true
+          Value: 'true'
         - Key: stickiness.type
           Value: lb_cookie
       Tags:
@@ -1840,7 +1840,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: !Ref SecurityGroup
-      IpProtocol: -1
+      IpProtocol: '-1'
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
