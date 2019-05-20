@@ -26,7 +26,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
-          - DBClustered
+          - DBEngine
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -116,8 +116,8 @@ Metadata:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
-      DBClustered:
-        default: Whether Database Clustering is Enabled
+      DBEngine:
+        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL)
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -350,12 +350,12 @@ Parameters:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
-  DBClustered:
-    Default: false
-    Description: 'Run PostgreSQL in a cluster using Amazon Aurora'
+  DBEngine:
+    Default: 'AWS Aurora PostgreSQL'
+    Description: 'Database Engine to use. PostgreSQL or AWS Aurora Clustered PostgreSQL'
     AllowedValues:
-      - true
-      - false
+      - 'AWS Aurora PostgreSQL'
+      - 'PostgreSQL'
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBInstanceClass:
@@ -705,7 +705,7 @@ Conditions:
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
   UseAurora:
-    !Equals [!Ref DBClustered, true]
+    !Equals [!Ref DBEngine, 'AWS Aurora PostgreSQL']
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
