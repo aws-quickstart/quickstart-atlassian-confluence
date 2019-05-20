@@ -10,10 +10,6 @@ Metadata:
           - CollaborativeEditingMode
           - ConfluenceVersion
       - Label:
-          default: Deployment information
-        Parameters:
-          - DeployEnvironment
-      - Label:
           default: Cluster nodes
         Parameters:
           - ClusterNodeInstanceType
@@ -48,13 +44,15 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
+          default: Cluster Node Deployment Repository; this is used to install and configure the application.
+        Parameters:
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationKeyName
+      - Label:
           default: Advanced (Optional)
         Parameters:
           - AutologinCookieAge
-          - ConfluenceDownloadUrl
-          - LocalAnsibleGitRepo
-          - LocalAnsibleGitSshKeyName
-          - StartCollectd
       - Label:
           default: Application Tuning (Optional) - dbref - https://confluence.atlassian.com/doc/performance-tuning-130289.html tomcatref - http://tomcat.apache.org/tomcat-8.0-doc/config/http.html
         Parameters:
@@ -138,8 +136,12 @@ Metadata:
         default: DB Timeout
       DBValidate:
         default: DB Validate
-      DeployEnvironment:
-        default: Deployment Environment
+      DeploymentAutomationRepository:
+        default: Deployment Automation Git Repository URL
+      DeploymentAutomationBranch:
+        default: Deployment Automation Branch
+      DeploymentAutomationKeyName:
+        default: SSH keyname to use with the repository (Optional)
       HostedZone:
         default: Route 53 Hosted Zone (optional)
       JvmHeapOverride:
@@ -148,10 +150,6 @@ Metadata:
         default: Synchrony Heap Size Override
       KeyPairName:
         default: Key Name *
-      LocalAnsibleGitRepo:
-        default: Git repo for local-ansible
-      LocalAnsibleGitSshKeyName:
-        default: Git SSH key name for local-ansible
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
@@ -442,15 +440,18 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
     Type: String
-  DeployEnvironment:
-    Default: prod
-    AllowedValues:
-      - prod
-      - stg
-      - dr
-    ConstraintDescription: Must be either Production (prod), Staging (stg), or Disaster Recovery (dr).
-    Description: Environment of the application - either Production, Staging, or Disaster Recovery (DR)
+  DeploymentAutomationRepository:
+    Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
     Type: String
+    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+  DeploymentAutomationBranch:
+    Default: "master"
+    Type: String
+    Description: The deployment automation repository branch to pull from.
+  DeploymentAutomationKeyName:
+    Default: ""
+    Type: String
+    Description: Named KeyPair name to use with this repository. The key should be uploaded the EC2 region. (Optional)
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
@@ -468,14 +469,6 @@ Parameters:
     Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
-    Type: String
-  LocalAnsibleGitRepo:
-    Default: ''
-    Description: For additional node customization, provide repo location to git clone. This must be in format git@bitbucket.org:atlassian/atlassian-local-ansible-example.git if using Bitbucket Cloud, or ssh://git@stash.example.com:7997/my-local-ansible.git (ie protocol included) if using Bitbucket Server.
-    Type: String
-  LocalAnsibleGitSshKeyName:
-    Default: ''
-    Description: If your git repo is private, provide an AWS Systems Manager ParameterStore key name that holds an SSH private key that can access the repo.
     Type: String
   MailEnabled:
     AllowedValues:
@@ -495,14 +488,7 @@ Parameters:
     MinLength: 0
     MaxLength: 90
     Type: String
-  StartCollectd:
-    Default: true
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: Must be 'true' or 'false'.
-    Description: Start the collectd service
-    Type: String
+
   SynchronyClusterNodeMax:
     Description: Maximum number of Synchrony cluster nodes
     Default: 1
@@ -654,8 +640,6 @@ Conditions:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   DisableMail:
     !Not [!Equals [!Ref MailEnabled, true]]
-  DoCollectd:
-    !Equals [!Ref StartCollectd, true]
   DoSetDBMasterUserPassword:
     !Not [!Equals [!Ref DBMasterUserPassword, '']]
   DoSSL:
@@ -1086,16 +1070,7 @@ Resources:
     Metadata:
       AWS::CloudFormation::Init:
         config:
-          packages:
-            !If
-              - DoCollectd
-              - yum:
-                  collectd: []
-                  collectd-java: []
-                  collectd-generic-jmx: []
-                  collectd-rrdtool: []
-                  collectd-disk: []
-              - !Ref "AWS::NoValue"
+
           files:
             /etc/atl:
               mode: "000640"
@@ -1105,25 +1080,40 @@ Resources:
                 !Join
                   - "\n"
                   -
+                    - "ATL_PRODUCT_FAMILY=confluence"
+                    - "ATL_PRODUCT_EDITION=confluence"
+                    - "ATL_JDBC_DRIVER=org.postgresql.Driver"
+                    - "ATL_JDBC_DB_NAME=confluence"
+                    - "ATL_JDBC_USER=atlconfluence"
+                    - "ATL_APP_DATA_MOUNT_ENABLED=false"
+                    - "ATL_CONFLUENCE_DATA_CENTER=true"
+                    - "ATL_ENABLED_PRODUCTS=Confluence"
+                    - "ATL_ENABLED_SHARED_HOMES="
+                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
+                    - "ATL_HAZELCAST_NETWORK_AWS_HOST_HEADER=ec2.amazonaws.com"
+                    - "ATL_RELEASE_S3_BUCKET=atlassian-software"
+                    - "ATL_RELEASE_S3_PATH=releases/confluence"
+                    - "ATL_SSL_SELF_CERT_ENABLED=false"
+                    -
+                    - !Sub ["ATL_PRODUCT_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
+                    - !Sub ["ATL_EFS_ID=${ElasticFileSystem}", ElasticFileSystem: !Ref "ElasticFileSystem"]
                     - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !If [UseSynchronyAutoScalingGroup, !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony/v1", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]]}], !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
                     - !Sub ["ATL_AUTOLOGIN_COOKIE_AGE=${AutologinCookieAge}", AutologinCookieAge: !Ref AutologinCookieAge]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
-                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !Sub ["ATL_DB_ACQUIREINCREMENT=${DBAcquireIncrement}", DBAcquireIncrement: !Ref DBAcquireIncrement]
                     - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
                     - !Sub ["ATL_DB_IDLETESTPERIOD=${DBIdleTestPeriod}", DBIdleTestPeriod: !Ref DBIdleTestPeriod]
                     - !Sub ["ATL_DB_MAXSTATEMENTS=${DBMaxStatements}", DBMaxStatements: !Ref DBMaxStatements]
-                    - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
+                    - !Sub ["ATL_DB_ROOT_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
                     - !Sub ["ATL_DB_POOLMAXSIZE=${DBPoolMaxSize}", DBPoolMaxSize: !Ref DBPoolMaxSize]
                     - !Sub ["ATL_DB_POOLMINSIZE=${DBPoolMinSize}", DBPoolMinSize: !Ref DBPoolMinSize]
                     - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
                     - !Sub ["ATL_DB_PREFERREDTESTQUERY=\"${DBPreferredTestQuery}\"", DBPreferredTestQuery: !Ref DBPreferredTestQuery]
                     - !Sub ["ATL_DB_TIMEOUT=${DBTimeout}", DBTimeout: !Ref DBTimeout]
                     - !Sub ["ATL_DB_VALIDATE=${DBValidate}", DBValidate: !Ref DBValidate]
-                    - !Sub ["ATL_ENVIRONMENT=${DeployEnvironment}", DeployEnvironment: !Ref DeployEnvironment]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
                     - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
@@ -1131,10 +1121,7 @@ Resources:
                     - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
                     - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
                     - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
-                    - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
-                    - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
                     - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]]
-                    - !Sub ["ATL_STARTCOLLECTD=${StartCollectd}", StartCollectd: !Ref StartCollectd]
                     - !Sub ["ATL_TOMCAT_ACCEPTCOUNT=${TomcatAcceptCount}", TomcatAcceptCount: !Ref TomcatAcceptCount]
                     - !Sub ["ATL_TOMCAT_CONNECTIONTIMEOUT=${TomcatConnectionTimeout}", TomcatConnectionTimeout: !Ref TomcatConnectionTimeout]
                     - !Sub ["ATL_TOMCAT_CONTEXTPATH=${TomcatContextPath}", TomcatContextPath: !Ref TomcatContextPath]
@@ -1147,116 +1134,48 @@ Resources:
                     - !Sub ["ATL_TOMCAT_REDIRECTPORT=${TomcatRedirectPort}", TomcatRedirectPort: !Ref TomcatRedirectPort]
                     - !Sub ["ATL_TOMCAT_SCHEME=${TomcatScheme}", TomcatScheme: !If [SSLScheme, https, http]]
                     - !Sub ["ATL_TOMCAT_SECURE=${TomcatSecure}", TomcatSecure: !If [SSLScheme, true, false]]
-                    - "ATL_APP_DATA_MOUNT_ENABLED=false"
-                    - "ATL_CONFLUENCE_DATA_CENTER=true"
-                    - "ATL_DB_NAME=confluence"
-                    - "ATL_ENABLED_PRODUCTS=Confluence"
-                    - "ATL_ENABLED_SHARED_HOMES="
-                    - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=Cluster"
-                    - "ATL_HAZELCAST_NETWORK_AWS_HOST_HEADER=ec2.amazonaws.com"
-                    - "ATL_JDBC_DRIVER=org.postgresql.Driver"
-                    - "ATL_JDBC_USER=atlconfluence"
-                    - "ATL_NGINX_ENABLED=false"
-                    - "ATL_POSTGRES_ENABLED=false"
-                    - "ATL_RELEASE_S3_BUCKET=atlassian-software"
-                    - "ATL_RELEASE_S3_PATH=releases/confluence"
-                    - "ATL_SSL_SELF_CERT_ENABLED=false"
-            /etc/cfn/cfn-hup.conf:
-              content:
-                !Join
-                  - "\n"
-                  -
-                    - "[main]"
-                    - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
-                    - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
-              mode: "000400"
-              owner: root
-              group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-              content:
-                !Join
-                  - "\n"
-                  -
-                    - "[cfn-auto-reloader-hook]"
-                    - triggers=post.update
-                    - "path=Resources.ClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
-                    - !Sub
-                      - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource ClusterNodeLaunchConfig --region ${Region}"
-                      - StackName: !Ref "AWS::StackName"
-                        Region: !Ref "AWS::Region"
-                    - runas=root
-            /tmp/bootstrap_local_ansible:
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+            /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
-                #!/usr/bin/env bash
-                # bootstrap any local-ansible repo that is passed in on this template
+                #!/bin/bash
+                key_location=/root/.ssh/deployment_repo_key
+                key_name="${DeploymentAutomationKeyName}"
 
-                localansiblerepopath=/home/localansible
-                gitkeylocation=/root/.ssh/gitkey
+                if [[ ! -z "$key_name" ]]; then
+                    # Ensure awscli is up to date
+                    pip install --upgrade awscli
+                    key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
+                    echo -e $key_val > $key_location
+                    chmod 600 $key_location
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
+                else:
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no"
+                fi
 
-                # ensure awscli is up to date
-                pip install --upgrade awscli
-                gitkey=$(aws --region=${AWS::Region} ssm get-parameters --names "${LocalAnsibleGitSshKeyName}" --with-decryption | jq --raw-output '.Parameters[0] .Value')
-                echo -e $gitkey > $gitkeylocation
-                chmod 600 $gitkeylocation
-                export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $gitkeylocation"
-
-                mkdir -p $localansiblerepopath
-                cd $localansiblerepopath
-                git clone "${LocalAnsibleGitRepo}"
-                cp $localansiblerepopath/*/local-ansible-run /usr/local/bin/local-ansible-run
-                chmod 750 /usr/local/bin/local-ansible-run
+                git clone "${DeploymentAutomationRepository}" -b "${DeploymentAutomationBranch}" /opt/atlassian/dc-deployments-automation/
               mode: "000750"
               owner: root
               group: root
+
           commands:
-            010_make_mount_point:
-              command: mkdir -p /media/atl
+            070_create_atl_dir:
+              test: "test ! -d /opt/atlassian/"
+              command: mkdir -p /opt/atlassian
               ignoreErrors: false
-            020_add_nfs_mount:
-              command:
-                !Join
-                  - ""
-                  -
-                    - "echo "
-                    - !If
-                      - UseHostedZone
-                      - !Ref EFSCname
-                      - !Sub
-                          - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
-                          - ElasticFileSystem: !Ref ElasticFileSystem
-                            Region: !Ref "AWS::Region"
-                    - ":/ /media/atl nfs4 rw,vers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0 >>/etc/fstab"
-              ignoreErrors: false
-            030_mount_all:
-              command: mount -a
+            071_install_packages:
+              command: yum install -y git python-virtualenv
               ignoreErrors: true
-            040_make_shared_home_dir:
-              command: mkdir -p /media/atl/confluence/shared-home
-              ignoreErrors: false
-            050_ssm_group:
-              command: groupadd ssm-user --gid 400 || groupmod -g 400 ssm-user
-            051_ssm_user:
-              command: useradd ssm-user --uid 400 -g ssm-user || usermod -u 400 ssm-user
-            052_ensure_ssm:
-              command: yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            072_clone_atl_scripts:
+              test: "test ! -d /opt/atlassian/dc-deployments-automation/"
+              command: /opt/atlassian/bin/clone_deployment_repo
               ignoreErrors: true
-            090_bootstrap_local_ansible:
-              command: /tmp/bootstrap_local_ansible > /var/log/bootstrap_local_ansible.log 2>&1
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: true
-                ensureRunning: true
-                files:
-                  - /etc/cfn/cfn-hup.conf
-                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
-              collectd:
-                !If [DoCollectd, {enabled: true, ensureRunning: true}, !Ref 'AWS::NoValue']
-              rpcbind:
-                enabled: true
-                ensureRunning: true
-                packages:
-                  yum: [nfs-utils]
+            080_run_atl_init_node:
+              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_jira_dc_node.yml /var/log/ansible-bootstrap.log
+              ignoreErrors: true
+
     Properties:
       AssociatePublicIpAddress: false
       BlockDeviceMappings:
@@ -1364,16 +1283,7 @@ Resources:
     Metadata:
       AWS::CloudFormation::Init:
         config:
-          packages:
-            !If
-              - DoCollectd
-              - yum:
-                  collectd: []
-                  collectd-java: []
-                  collectd-generic-jmx: []
-                  collectd-rrdtool: []
-                  collectd-disk: []
-              - !Ref AWS::NoValue
+
           files:
             /etc/atl:
               mode: "000640"
@@ -1383,26 +1293,6 @@ Resources:
                 !Join
                   - "\n"
                   -
-                    - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
-                    - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
-                    - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
-                    - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
-                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
-                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
-                    - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
-                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
-                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
-                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
-                    - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
-                    - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
-                    - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
-                    - !Sub ["ATL_LOCALANSIBLE_REPO=${AnsibleRepo}", AnsibleRepo: !Ref LocalAnsibleGitRepo]
-                    - !Sub ["ATL_LOCALANSIBLE_SSHKEYNAME=${AnsibleKey}", AnsibleKey: !Ref LocalAnsibleGitSshKeyName]
-                    - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]]
-                    - !Sub ["ATL_SYNCHRONY_MEMORY=-Xmx${AtlJvmHeapSynchrony}", AtlJvmHeapSynchrony: !If [OverrideHeapSynchrony, !Ref 'JvmHeapOverrideSynchrony', '2g']]
-                    - !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]]}]
                     - "ATL_APP_DATA_MOUNT_ENABLED=false"
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
                     - "ATL_DB_NAME=confluence"
@@ -1418,100 +1308,66 @@ Resources:
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
                     - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
                     - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
-            /etc/cfn/cfn-hup.conf:
-              content:
-                !Join
-                  - "\n"
-                  -
-                    - "[main]"
-                    - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
-                    - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
-              mode: "000400"
-              owner: root
-              group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-              content:
-                !Join
-                  - "\n"
-                  -
-                    - "[cfn-auto-reloader-hook]"
-                    - triggers=post.update
-                    - "path=Resources.SynchronyClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
-                    - !Sub
-                      - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource SynchronyClusterNodeLaunchConfig --region ${Region}"
-                      - StackName: !Ref "AWS::StackName"
-                        Region: !Ref "AWS::Region"
-                    - runas=root
-            /tmp/bootstrap_local_ansible:
+                    - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
+                    - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
+                    - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
+                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
+                    - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
+                    - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
+                    - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${ConfluenceClusterNodeRole}", ConfluenceClusterNodeRole: !Ref ConfluenceClusterNodeRole]
+                    - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+                    - !Sub ["ATL_HOSTEDZONE=${HostedZone}", HostedZone: !Ref HostedZone]
+                    - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
+                    - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                    - !Sub ["ATL_JVM_HEAP=${AtlJvmHeap}", AtlJvmHeap: !If [OverrideHeap, !Ref 'JvmHeapOverride', !FindInMap [AWSInstanceType2Arch, !Ref ClusterNodeInstanceType, Jvmheap]]]
+                    - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]]
+                    - !Sub ["ATL_SYNCHRONY_MEMORY=-Xmx${AtlJvmHeapSynchrony}", AtlJvmHeapSynchrony: !If [OverrideHeapSynchrony, !Ref 'JvmHeapOverrideSynchrony', '2g']]
+                    - !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]]}]
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
+                    - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+            /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
-                #!/usr/bin/env bash
-                # bootstrap any local-ansible repo that is passed in on this template
+                #!/bin/bash
+                key_location=/root/.ssh/deployment_repo_key
+                key_name="${DeploymentAutomationKeyName}"
 
-                localansiblerepopath=/home/localansible
-                gitkeylocation=/root/.ssh/gitkey
+                if [[ ! -z "$key_name" ]]; then
+                    # Ensure awscli is up to date
+                    pip install --upgrade awscli
+                    key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
+                    echo -e $key_val > $key_location
+                    chmod 600 $key_location
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
+                else:
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no"
+                fi
 
-                gitkey=$(aws --region=${AWS::Region} ssm get-parameters --names "${LocalAnsibleGitSshKeyName}" --with-decryption | jq --raw-output '.Parameters[0] .Value')
-                echo -e $gitkey > $gitkeylocation
-                chmod 600 $gitkeylocation
-                export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $gitkeylocation"
-
-                mkdir -p $localansiblerepopath
-                cd $localansiblerepopath
-                git clone "${LocalAnsibleGitRepo}"
-                cp $localansiblerepopath/*/local-ansible-run /usr/local/bin/local-ansible-run
-                chmod 750 /usr/local/bin/local-ansible-run
+                git clone "${DeploymentAutomationRepository}" -b "${DeploymentAutomationBranch}" /opt/atlassian/dc-deployments-automation/
               mode: "000750"
               owner: root
               group: root
+
           commands:
-            010_make_mount_point:
-              command: mkdir -p /media/atl
+            070_create_atl_dir:
+              test: "test ! -d /opt/atlassian/"
+              command: mkdir -p /opt/atlassian
               ignoreErrors: false
-            020_add_nfs_mount:
-              command:
-                !Join
-                  - ""
-                  -
-                    - "echo "
-                    - !If
-                      - UseHostedZone
-                      - !Ref EFSCname
-                      - !Sub
-                          - $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).${ElasticFileSystem}".efs."${Region}".amazonaws.com"
-                          - ElasticFileSystem: !Ref ElasticFileSystem
-                            Region: !Ref "AWS::Region"
-                    - ":/ /media/atl nfs4 rw,vers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0 >>/etc/fstab"
-              ignoreErrors: false
-            030_mount_all:
-              command: mount -a
+            071_install_packages:
+              command: yum install -y git python-virtualenv
               ignoreErrors: true
-            040_make_shared_home_dir:
-              command: mkdir -p /media/atl/confluence/shared-home
-              ignoreErrors: false
-            050_ssm_group:
-              command: groupadd ssm-user --gid 400 || groupmod -g 400 ssm-user
-            051_ssm_user:
-              command: useradd ssm-user --uid 400 -g ssm-user || usermod -u 400 ssm-user
-            052_ensure_ssm:
-              command: yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-            090_bootstrap_local_ansible:
-              command: /tmp/bootstrap_local_ansible > /var/log/bootstrap_local_ansible.log 2>&1
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: true
-                ensureRunning: true
-                files:
-                  - /etc/cfn/cfn-hup.conf
-                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
-              collectd:
-                !If [DoCollectd, {enabled: true, ensureRunning: true}, !Ref 'AWS::NoValue']
-              rpcbind:
-                enabled: true
-                ensureRunning: true
-                packages:
-                  yum:
-                    - nfs-utils
+            072_clone_atl_scripts:
+              test: "test ! -d /opt/atlassian/dc-deployments-automation/"
+              command: /opt/atlassian/bin/clone_deployment_repo
+              ignoreErrors: true
+            080_run_atl_init_node:
+              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_jira_dc_node.yml /var/log/ansible-bootstrap.log
+              ignoreErrors: true
+
     Properties:
       AssociatePublicIpAddress: false
       BlockDeviceMappings:
