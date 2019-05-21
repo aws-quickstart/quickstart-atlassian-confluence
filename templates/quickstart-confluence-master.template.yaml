@@ -1452,6 +1452,10 @@ Resources:
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
                     - "ATL_RELEASE_S3_PATH=releases/confluence"
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
+                    - "ATL_SYNCHRONY_DATABASE_IDLE_CONNECTION_TEST_PERIOD=100"
+                    - "ATL_SYNCHRONY_DATABASE_MAX_IDLE_TIME=0"
+                    - "ATL_SYNCHRONY_DATABASE_MAX_IDLE_TIME_EXCESS_CONNECTIONS=0"
+                    - "ATL_SYNCHRONY_DATABASE_TEST_CONNECTION_ON_CHECKIN=true"
                     - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
                     - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
             /etc/cfn/cfn-hup.conf:
