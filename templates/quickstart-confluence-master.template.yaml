@@ -1680,6 +1680,8 @@ Resources:
         DBAllocatedStorage: !Ref DBStorage
         DBStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !If [DBProvisionedIops, io1, gp2]
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
   DBCname:
     Condition: UseHostedZone
     Type: AWS::Route53::RecordSet
