@@ -1081,7 +1081,6 @@ Resources:
                   - "\n"
                   -
                     - "ATL_PRODUCT_FAMILY=confluence"
-                    - "ATL_PRODUCT_EDITION=confluence"
                     - "ATL_JDBC_DRIVER=org.postgresql.Driver"
                     - "ATL_JDBC_DB_NAME=confluence"
                     - "ATL_JDBC_USER=atlconfluence"
@@ -1173,7 +1172,7 @@ Resources:
               command: /opt/atlassian/bin/clone_deployment_repo
               ignoreErrors: true
             080_run_atl_init_node:
-              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_jira_dc_node.yml /var/log/ansible-bootstrap.log
+              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_confluence_dc_node.yml /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
     Properties:
