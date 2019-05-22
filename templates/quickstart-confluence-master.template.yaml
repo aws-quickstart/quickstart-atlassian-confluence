@@ -1307,11 +1307,11 @@ Resources:
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
                     - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
                     - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
+                    - !Sub ["ATL_PRODUCT_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
                     - !Sub ["ATL_CONFLUENCE_INSTALLER_DOWNLOAD_URL=${ConfluenceDownloadUrl}", ConfluenceDownloadUrl: !Ref ConfluenceDownloadUrl]
-                    - !Sub ["ATL_CONFLUENCE_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
                     - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
                     - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
@@ -1364,7 +1364,7 @@ Resources:
               command: /opt/atlassian/bin/clone_deployment_repo
               ignoreErrors: true
             080_run_atl_init_node:
-              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_jira_dc_node.yml /var/log/ansible-bootstrap.log
+              command: cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_synchrony_node.yml /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
     Properties:
