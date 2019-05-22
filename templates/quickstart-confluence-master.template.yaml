@@ -704,8 +704,6 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
-  UseAurora:
-    !Equals [!Ref DBEngine, 'AWS Aurora PostgreSQL']
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
@@ -720,8 +718,6 @@ Conditions:
     !Equals [!Ref CollaborativeEditingMode, 'synchrony-separate-nodes']
   GovCloudCondition:
     !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
-  DBProvisionedIops:
-    !Equals [!Ref DBStorageType, Provisioned IOPS]
 Mappings:
   AWSInstanceType2Arch:
     c4.xlarge:
@@ -1679,7 +1675,7 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBAllocatedStorage: !Ref DBStorage
         DBStorageEncrypted: !Ref DBStorageEncrypted
-        DBStorageType: !If [DBProvisionedIops, io1, gp2]
+        DBStorageType: !Ref DBStorageType
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   DBCname:
