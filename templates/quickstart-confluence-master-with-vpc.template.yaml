@@ -27,6 +27,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
+          - DBEngine
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -116,6 +117,8 @@ Metadata:
         default: Existing DNS name (optional)
       DBAcquireIncrement:
           default: DB Acquire Increment
+      DBEngine:
+        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL)
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBInstanceClass:
@@ -357,6 +360,14 @@ Parameters:
   CustomDnsName:
     Default: ''
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
+    Type: String
+  DBEngine:
+    Default: 'AWS Aurora PostgreSQL'
+    Description: 'Database Engine to use. PostgreSQL or AWS Aurora Clustered PostgreSQL'
+    AllowedValues:
+      - 'AWS Aurora PostgreSQL'
+      - 'PostgreSQL'
+    ConstraintDescription: Must be 'AWS Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBInstanceClass:
     Default: db.t2.medium
@@ -745,6 +756,7 @@ Resources:
         ConfluenceDownloadUrl: !Ref 'ConfluenceDownloadUrl'
         ConfluenceVersion: !Ref 'ConfluenceVersion'
         CustomDnsName: !Ref 'CustomDnsName'
+        DBEngine: !Ref DBEngine
         DBInstanceClass: !Ref 'DBInstanceClass'
         DBIops: !Ref 'DBIops'
         DBMasterUserPassword: !Ref 'DBMasterUserPassword'
@@ -785,6 +797,8 @@ Resources:
         TomcatProtocol: !Ref 'TomcatProtocol'
         TomcatRedirectPort: !Ref 'TomcatRedirectPort'
         TomcatScheme: !Ref 'TomcatScheme'
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
 
 Outputs:
   ServiceURL:
