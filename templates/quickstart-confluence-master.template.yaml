@@ -356,7 +356,7 @@ Parameters:
     AllowedValues:
       - 'AWS Aurora PostgreSQL'
       - 'PostgreSQL'
-    ConstraintDescription: Must be 'true' or 'false'.
+    ConstraintDescription: Must be 'AWS Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBInstanceClass:
     Default: db.t2.medium
