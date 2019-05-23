@@ -459,8 +459,8 @@ Parameters:
     AllowedValues:
       - General Purpose (SSD)
       - Provisioned IOPS
-    ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'. Not valid for Aurora
-    Description: Database storage type
+    ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
+    Description: Database storage type. Not valid for Aurora
     Type: String
   DeployEnvironment:
     Default: prod
