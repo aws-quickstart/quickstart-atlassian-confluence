@@ -117,7 +117,7 @@ Metadata:
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBEngine:
-        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL)
+        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL (in beta))
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -351,8 +351,8 @@ Parameters:
     Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
   DBEngine:
-    Default: 'AWS Aurora PostgreSQL'
-    Description: 'Database Engine to use. PostgreSQL or AWS Aurora Clustered PostgreSQL'
+    Default: 'PostgreSQL'
+    Description: 'Database Engine to use. Choose between RDS PostgreSQL or clustered AWS Aurora PostgreSQL'
     AllowedValues:
       - 'AWS Aurora PostgreSQL'
       - 'PostgreSQL'
@@ -389,14 +389,14 @@ Parameters:
     Type: Number
   DBMasterUserPassword:
     AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
-    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol
-    Description: Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     MinLength: 8
     MaxLength: 128
     NoEcho: true
     Type: String
   DBMultiAZ:
-    Description: Whether to provision a multi-AZ RDS instance.
+    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'AWS Aurora PostgreSQL', this will determine whether to provision a single or a multi node Aurora cluster 
     Default: true
     AllowedValues:
       - true
@@ -404,9 +404,9 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBPassword:
-    AllowedPattern: '[a-zA-Z0-9]*'
-    ConstraintDescription: Must be at least 8 alphanumeric characters.
-    Description: Database user account password.
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ ) " ') symbol
+    Description: Password for the user account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     MinLength: 8
     MaxLength: 128
     NoEcho: true
