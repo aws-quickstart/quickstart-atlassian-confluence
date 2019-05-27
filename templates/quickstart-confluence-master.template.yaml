@@ -117,7 +117,7 @@ Metadata:
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBEngine:
-        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL (in beta))
+        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL)
       DBInstanceClass:
         default: Database instance class
       DBIops:
