@@ -421,7 +421,7 @@ Parameters:
     Type: String
   DBTimeout:
     Default: 30
-    Description: Number of seconds that Connections in excess of minPoolSize should be permitted to remain idle in the pool before being culled
+    Description: Seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire.
     Type: String
   DBIdleTestPeriod:
     Default: 100
