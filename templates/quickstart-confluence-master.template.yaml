@@ -1435,6 +1435,8 @@ Resources:
                     - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !GetAtt LoadBalancer.DNSName]]]
                     - !Sub ["ATL_SYNCHRONY_MEMORY=-Xmx${AtlJvmHeapSynchrony}", AtlJvmHeapSynchrony: !If [OverrideHeapSynchrony, !Ref 'JvmHeapOverrideSynchrony', '2g']]
                     - !Sub ["ATL_SYNCHRONY_SERVICE_URL=${Protocol}://${LoadBalancerName}/synchrony", {Protocol: !If [SSLScheme, "https", "http"], LoadBalancerName: !If [UseCustomDnsName, !Ref CustomDnsName, !If [UseHostedZone, !Ref LoadBalancerCname, !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]]}]
+                    - !Sub ["ATL_SYNCHRONY_DATABASE_IDLE_CONNECTION_TEST_PERIOD=${TestPeriod}", TestPeriod: !Ref DBIdleTestPeriod]
+                    - !Sub ["ATL_SYNCHRONY_DATABASE_MAX_IDLE_TIME=${Timeout}", Timeout: !Ref DBTimeout]
                     - "ATL_APP_DATA_MOUNT_ENABLED=false"
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
                     - "ATL_DB_NAME=confluence"
@@ -1448,8 +1450,6 @@ Resources:
                     - "ATL_RELEASE_S3_BUCKET=atlassian-software"
                     - "ATL_RELEASE_S3_PATH=releases/confluence"
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
-                    - "ATL_SYNCHRONY_DATABASE_IDLE_CONNECTION_TEST_PERIOD=0"
-                    - "ATL_SYNCHRONY_DATABASE_MAX_IDLE_TIME=30"
                     - "ATL_SYNCHRONY_DATABASE_MAX_IDLE_TIME_EXCESS_CONNECTIONS=0"
                     - "ATL_SYNCHRONY_DATABASE_TEST_CONNECTION_ON_CHECKIN=true"
                     - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
