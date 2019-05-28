@@ -367,34 +367,18 @@ Parameters:
       - db.m4.4xlarge
       - db.m4.10xlarge
       - db.m4.16xlarge
-      - db.m5.large
-      - db.m5.xlarge
-      - db.m5.2xlarge
-      - db.m5.4xlarge
-      - db.m5.12xlarge
-      - db.m5.24xlarge
       - db.r4.large
       - db.r4.xlarge
       - db.r4.2xlarge
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
-      - db.r5.large
-      - db.r5.xlarge
-      - db.r5.2xlarge
-      - db.r5.4xlarge
-      - db.r5.12xlarge
-      - db.r5.24xlarge
       - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
-      - db.t3.medium
-      - db.t3.large
-      - db.t3.xlarge
-      - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type. See http://docs.amazonaws.cn/en_us/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html for Aurora compatible instance types and https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html#Concepts.DBInstanceClass.Support for PostgreSQL compatible instance types
+    Description: RDS instance type (must be r4 family if using Aurora)
     Type: String
   DBIops:
     Default: 1000
