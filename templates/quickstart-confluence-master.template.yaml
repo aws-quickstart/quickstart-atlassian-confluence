@@ -1304,7 +1304,7 @@ Resources:
                   -
                     - "ATL_APP_DATA_MOUNT_ENABLED=false"
                     - "ATL_CONFLUENCE_DATA_CENTER=true"
-                    - "ATL_DB_NAME=confluence"
+                    - "ATL_JDBC_DB_NAME=confluence"
                     - "ATL_ENABLED_PRODUCTS=Synchrony"
                     - "ATL_ENABLED_SHARED_HOMES="
                     - "ATL_HAZELCAST_NETWORK_AWS_TAG_KEY=synchrony_service"
@@ -1317,6 +1317,7 @@ Resources:
                     - "ATL_SSL_SELF_CERT_ENABLED=false"
                     - "ATL_SYNCHRONY_STACK_SPACE=-Xss2048k"
                     - "ATL_SYNCHRONY_WAITING_CONFIG_TIME=20"
+                    - !Sub ["ATL_EFS_ID=${ElasticFileSystem}", ElasticFileSystem: !Ref "ElasticFileSystem"]
                     - !Sub ["ATL_PRODUCT_VERSION=${ConfluenceVersion}", ConfluenceVersion: !Ref ConfluenceVersion]
                     - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
