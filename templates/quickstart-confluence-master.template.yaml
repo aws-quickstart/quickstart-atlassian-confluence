@@ -383,7 +383,7 @@ Parameters:
   DBIops:
     Default: 1000
     ConstraintDescription: Must be in the range 1000 - 30000.
-    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not valid for Aurora'
+    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not used for Aurora.'
     MinValue: 1000
     MaxValue: 30000
     Type: Number
@@ -421,7 +421,7 @@ Parameters:
     Type: String
   DBTimeout:
     Default: 30
-    Description: Seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire.
+    Description: Seconds a connection can remain pooled but unused before being discarded. Zero means idle connections never expire.
     Type: String
   DBIdleTestPeriod:
     Default: 100
@@ -445,7 +445,7 @@ Parameters:
     Type: String
   DBStorage:
     Default: 10
-    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not valid for Aurora
+    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.
     Type: Number
   DBStorageEncrypted:
     Default: false
@@ -460,7 +460,7 @@ Parameters:
       - General Purpose (SSD)
       - Provisioned IOPS
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
-    Description: Database storage type. Not valid for Aurora
+    Description: Database storage type. Not used for Aurora.
     Type: String
   DeployEnvironment:
     Default: prod
