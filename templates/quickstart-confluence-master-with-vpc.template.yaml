@@ -342,7 +342,7 @@ Parameters:
     Description: Collaborative Editing can be off, run locallly on the Confluence nodes (leave 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
   ConfluenceVersion:
-    Default: '6.13.2'
+    Default: '6.13.5'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
     ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
