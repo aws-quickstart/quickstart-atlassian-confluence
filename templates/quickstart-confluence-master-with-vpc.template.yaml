@@ -104,8 +104,6 @@ Metadata:
         default: Cluster node instance volume size
       CollaborativeEditingMode:
         default: Collaborative editing mode
-      ConfluenceDownloadUrl:
-        default: Confluence download URL
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
@@ -343,11 +341,6 @@ Parameters:
       - synchrony-separate-nodes
     Description: Collaborative Editing can be off, run locallly on the Confluence nodes (leave 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
-  ConfluenceDownloadUrl:
-    Default: ''
-    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter blank to automatically download the official version you specified earlier.
-    Type: String
-    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
   ConfluenceVersion:
     Default: '6.13.2'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
@@ -741,7 +734,6 @@ Resources:
         ClusterNodeMin: !Ref 'ClusterNodeMin'
         ClusterNodeVolumeSize: !Ref 'ClusterNodeVolumeSize'
         CollaborativeEditingMode: !Ref 'CollaborativeEditingMode'
-        ConfluenceDownloadUrl: !Ref 'ConfluenceDownloadUrl'
         ConfluenceVersion: !Ref 'ConfluenceVersion'
         CustomDnsName: !Ref 'CustomDnsName'
         DBInstanceClass: !Ref 'DBInstanceClass'
