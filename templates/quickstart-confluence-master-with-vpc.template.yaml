@@ -84,8 +84,6 @@ Metadata:
           - QSS3KeyPrefix
 
     ParameterLabels:
-      AccessCIDR:
-        default: Trusted IP range
       AssociatePublicIpAddress:
         default: Assign public IP
       AvailabilityZones:
@@ -156,20 +154,8 @@ Metadata:
         default: Synchrony Heap Size Override
       KeyPairName:
         default: Key Name *
-      LocalAnsibleGitRepo:
-        default: Git repo for local-ansible
-      LocalAnsibleGitSshKeyName:
-        default: Git SSH key name for local-ansible
       MailEnabled:
         default: Enable App to Process Email
-      PrivateSubnet1CIDR:
-        default: AZ1 private IP address block
-      PrivateSubnet2CIDR:
-        default: AZ2 private IP address block
-      PublicSubnet1CIDR:
-        default: AZ1 public IP address block        
-      PublicSubnet2CIDR:
-        default: AZ2 public IP address block
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
@@ -204,8 +190,6 @@ Metadata:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
-      VPCCIDR:
-        default: IP address block for the VPC
 
 Parameters:
   AssociatePublicIpAddress:
@@ -489,14 +473,6 @@ Parameters:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances.
     Type: String
-  LocalAnsibleGitRepo:
-    Default: ''
-    Description: For additional node customization, provide repo location to git clone. This must be in format git@bitbucket.org:atlassian/atlassian-local-ansible-example.git if using Bitbucket Cloud, or ssh://git@stash.example.com:7997/my-local-ansible.git (ie protocol included) if using Bitbucket Server.
-    Type: String
-  LocalAnsibleGitSshKeyName:
-    Default: ''
-    Description: If your git repo is private, provide an AWS Systems Manager ParameterStore key name that holds an SSH private key that can access the repo.
-    Type: String
   MailEnabled:
     AllowedValues:
       - true
@@ -760,8 +736,6 @@ Resources:
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmHeapOverrideSynchrony: !Ref 'JvmHeapOverrideSynchrony'
         KeyPairName: !Ref 'KeyPairName'
-        LocalAnsibleGitRepo: !Ref 'LocalAnsibleGitRepo'
-        LocalAnsibleGitSshKeyName: !Ref 'LocalAnsibleGitSshKeyName'
         MailEnabled: !Ref 'MailEnabled'
         SubDomainName: !Ref 'SubDomainName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
