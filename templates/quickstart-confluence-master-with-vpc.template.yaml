@@ -11,10 +11,6 @@ Metadata:
           - CollaborativeEditingMode
           - ConfluenceVersion
       - Label:
-          default: Deployment information
-        Parameters:
-          - DeployEnvironment
-      - Label:
           default: Cluster nodes
         Parameters:
           - ClusterNodeInstanceType
@@ -50,12 +46,12 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
-          default: Advanced (Optional)
+          default: Cluster Node Deployment Repository; this is used to install and configure the application.
         Parameters:
-          - ConfluenceDownloadUrl
-          - LocalAnsibleGitRepo
-          - LocalAnsibleGitSshKeyName
-          - StartCollectd
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
       - Label:
           default: Application Tuning (Optional) - dbref - https://confluence.atlassian.com/doc/performance-tuning-130289.html tomcatref - http://tomcat.apache.org/tomcat-8.0-doc/config/http.html
         Parameters:
@@ -108,8 +104,6 @@ Metadata:
         default: Cluster node instance volume size
       CollaborativeEditingMode:
         default: Collaborative editing mode
-      ConfluenceDownloadUrl:
-        default: Confluence download URL
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
@@ -146,8 +140,14 @@ Metadata:
         default: DB Timeout
       DBValidate:
         default: DB Validate
-      DeployEnvironment:
-        default: Deployment Environment
+      DeploymentAutomationRepository:
+        default: Deployment Automation Git Repository URL
+      DeploymentAutomationBranch:
+        default: Deployment Automation Branch
+      DeploymentAutomationPlaybook:
+        default: The Ansible playbook to invoke to initialise the instance.
+      DeploymentAutomationKeyName:
+        default: SSH keyname to use with the repository (Optional)
       HostedZone:
         default: Route 53 Hosted Zone (optional)
       JvmHeapOverride:
@@ -172,8 +172,6 @@ Metadata:
         default: AZ2 public IP address block
       SSLCertificateARN:
         default: SSL Certificate ARN
-      StartCollectd:
-        default: Start the collectd metrics agent
       SubDomainName:
         default: Sub-domain for Hosted Zone (optional)
       SynchronyClusterNodeMax:
@@ -343,13 +341,8 @@ Parameters:
       - synchrony-separate-nodes
     Description: Collaborative Editing can be off, run locallly on the Confluence nodes (leave 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
-  ConfluenceDownloadUrl:
-    Default: ''
-    Description: This parameter is used to download a custom Confluence version for testing purposes. Leave this parameter blank to automatically download the official version you specified earlier.
-    Type: String
-    ConstraintDescription: "Must be a valid Confluence download url from version 6.1.x or higher. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
   ConfluenceVersion:
-    Default: '6.13.2'
+    Default: '6.13.5'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
     ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
@@ -462,15 +455,22 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
     Type: String
-  DeployEnvironment:
-    Default: prod
-    AllowedValues:
-      - prod
-      - stg
-      - dr
-    ConstraintDescription: Must be either Production (prod), Staging (stg), or Disaster Recovery (dr).
-    Description: Environment of the application - either Production, Staging, or Disaster Recovery (DR).
+  DeploymentAutomationRepository:
+    Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
     Type: String
+    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+  DeploymentAutomationBranch:
+    Default: "master"
+    Type: String
+    Description: The deployment automation repository branch to pull from.
+  DeploymentAutomationPlaybook:
+    Default: "aws_confluence_dc_node.yml"
+    Type: String
+    Description: The Ansible playbook to invoke to initialise the application node on first start.
+  DeploymentAutomationKeyName:
+    Default: ""
+    Type: String
+    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
@@ -514,14 +514,6 @@ Parameters:
     Description: "Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created."
     MinLength: 0
     MaxLength: 90
-    Type: String
-  StartCollectd:
-    Default: true
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: Must be 'true' or 'false'.
-    Description: Start the collectd service.
     Type: String
   SynchronyClusterNodeMax:
     Description: Maximum number of Synchrony cluster nodes
@@ -742,7 +734,6 @@ Resources:
         ClusterNodeMin: !Ref 'ClusterNodeMin'
         ClusterNodeVolumeSize: !Ref 'ClusterNodeVolumeSize'
         CollaborativeEditingMode: !Ref 'CollaborativeEditingMode'
-        ConfluenceDownloadUrl: !Ref 'ConfluenceDownloadUrl'
         ConfluenceVersion: !Ref 'ConfluenceVersion'
         CustomDnsName: !Ref 'CustomDnsName'
         DBInstanceClass: !Ref 'DBInstanceClass'
@@ -761,7 +752,10 @@ Resources:
         DBStorage: !Ref 'DBStorage'
         DBStorageEncrypted: !Ref 'DBStorageEncrypted'
         DBStorageType: !Ref 'DBStorageType'
-        DeployEnvironment: !Ref 'DeployEnvironment'
+        DeploymentAutomationRepository: !Ref 'DeploymentAutomationRepository'
+        DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
+        DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
+        DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         HostedZone: !Ref 'HostedZone'
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmHeapOverrideSynchrony: !Ref 'JvmHeapOverrideSynchrony'
@@ -771,7 +765,6 @@ Resources:
         MailEnabled: !Ref 'MailEnabled'
         SubDomainName: !Ref 'SubDomainName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
-        StartCollectd: !Ref 'StartCollectd'
         SynchronyClusterNodeMax: !Ref 'SynchronyClusterNodeMax'
         SynchronyClusterNodeMin: !Ref 'SynchronyClusterNodeMin'
         SynchronyNodeInstanceType: !Ref 'SynchronyNodeInstanceType'
