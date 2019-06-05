@@ -702,6 +702,10 @@ Conditions:
     !Equals [!Ref CollaborativeEditingMode, 'synchrony-separate-nodes']
   GovCloudCondition:
     !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
+  DBEngineAurora:
+    !Equals [!Ref DBEngine, "AWS Aurora PostgreSQL"]
+  DBEnginePostgres:
+    !Equals [!Ref DBEngine, "PostgreSQL"]
 Mappings:
   AWSInstanceType2Arch:
     c4.xlarge:
@@ -1136,6 +1140,7 @@ Resources:
                     - !Sub ["ATL_AUTOLOGIN_COOKIE_AGE=${AutologinCookieAge}", AutologinCookieAge: !Ref AutologinCookieAge]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
                     - !Sub ["ATL_DB_ACQUIREINCREMENT=${DBAcquireIncrement}", DBAcquireIncrement: !Ref DBAcquireIncrement]
+                    - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
                     - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress]
                     - !Sub ["ATL_DB_IDLETESTPERIOD=${DBIdleTestPeriod}", DBIdleTestPeriod: !Ref DBIdleTestPeriod]
                     - !Sub ["ATL_DB_MAXSTATEMENTS=${DBMaxStatements}", DBMaxStatements: !Ref DBMaxStatements]
@@ -1347,6 +1352,7 @@ Resources:
                     - !If [SSLScheme, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                     - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
                     - !Sub ["ATL_CATALINA_OPTS=\"${CatalinaOpts} ${MailOpts}\"", { CatalinaOpts: !Ref CatalinaOpts, MailOpts: !If [DisableMail, '-Datlassian.mail.senddisabled=true -Datlassian.mail.fetchdisabled=true -Datlassian.mail.popdisabled=true -Dconfluence.disable.mailpolling=true', ''] }]
+                    - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
                     - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Outputs.RDSEndPointAddress]
                     - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Outputs.RDSEndPointPort]
                     - !Sub ["ATL_DB_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
