@@ -41,20 +41,20 @@ Metadata:
           - KeyPairName
           - SSLCertificateARN
       - Label:
-          default: DNS (Optional)
+          default: DNS
         Parameters:
           - CustomDnsName
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster Node Deployment Repository; this is used to install and configure the application.
+          default: Cluster Node Deployment Repository
         Parameters:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
           - DeploymentAutomationKeyName
       - Label:
-          default: Application Tuning (Optional) - dbref - https://confluence.atlassian.com/doc/performance-tuning-130289.html tomcatref - http://tomcat.apache.org/tomcat-8.0-doc/config/http.html
+          default: Application Tuning
         Parameters:
           - TomcatContextPath
           - CatalinaOpts
@@ -106,11 +106,11 @@ Metadata:
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
-        default: Existing DNS name (optional)
+        default: (Optional) Existing DNS name
       DBAcquireIncrement:
           default: DB Acquire Increment
       DBEngine:
-        default: The database engine to deploy with (PostgreSQL or AWS Aurora PostgreSQL)
+        default: Database Engine
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBInstanceClass:
@@ -148,9 +148,9 @@ Metadata:
       DeploymentAutomationPlaybook:
         default: The Ansible playbook to invoke to initialise the instance.
       DeploymentAutomationKeyName:
-        default: SSH keyname to use with the repository (Optional)
+        default: (Optional) SSH keyname to use with the repository
       HostedZone:
-        default: Route 53 Hosted Zone (optional)
+        default: (Optional) Route 53 Hosted Zone
       JvmHeapOverride:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
@@ -162,7 +162,7 @@ Metadata:
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
-        default: Sub-domain for Hosted Zone (optional)
+        default: (Optional)Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -340,11 +340,11 @@ Parameters:
     Type: String
   DBEngine:
     Default: 'PostgreSQL'
-    Description: 'Database Engine to use. PostgreSQL or AWS Aurora Clustered PostgreSQL'
+    Description: 'The database engine to use. The default is PostgreSQL (Amazon RDS for PostgreSQL). You can choose Amazon Aurora PostgreSQL.'
     AllowedValues:
-      - 'AWS Aurora PostgreSQL'
+      - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
-    ConstraintDescription: Must be 'AWS Aurora PostgreSQL' or 'PostgreSQL'.
+    ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -366,12 +366,12 @@ Parameters:
       - db.t2.xlarge
       - db.t2.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list.
-    Description: RDS instance type (must be r4 family if using Aurora).
+    Description: RDS instance type (must be r4 family if using Amazon Aurora).
     Type: String
   DBIops:
     Default: 1000
     ConstraintDescription: Must be in the range 1000 - 30000.
-    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not used for Aurora.'
+    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not used for Amazon Aurora.'
     MinValue: 1000
     MaxValue: 30000
     Type: Number
@@ -401,7 +401,7 @@ Parameters:
     Type: String
   DBPoolMaxSize:
     Default: 60
-    Description: The maximum number of database connections that can be opened at any time.
+    Description: The maximum number of database connections that can be opened at any time. See https://confluence.atlassian.com/doc/performance-tuning-130289.html for reference on tuning database parameters.
     Type: String
   DBPoolMinSize:
     Default: 20
@@ -433,7 +433,7 @@ Parameters:
     Type: String
   DBStorage:
     Default: 10
-    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.
+    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Amazon Aurora.
     Type: Number
   DBStorageEncrypted:
     Default: false
@@ -448,7 +448,7 @@ Parameters:
       - General Purpose (SSD)
       - Provisioned IOPS
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
-    Description: Database storage type. Not used for Aurora.
+    Description: Database storage type. Not used for Amazon Aurora.
     Type: String
   DeploymentAutomationRepository:
     Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
@@ -465,7 +465,7 @@ Parameters:
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
@@ -617,7 +617,7 @@ Parameters:
   TomcatContextPath:
     Default: ''
     AllowedPattern: '^(\/[A-z_\-0-9\.]+)?$'
-    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/".
+    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/".  See http://tomcat.apache.org/tomcat-8.0-doc/config/http.html for reference on tuning tomcat parameters.
     Type: String
   TomcatDefaultConnectorPort:
     Default: 8080
