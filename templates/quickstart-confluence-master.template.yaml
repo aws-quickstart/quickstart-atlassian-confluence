@@ -45,7 +45,7 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster Node Deployment Repository.
+          default: Cluster Node Deployment Repository
         Parameters:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
