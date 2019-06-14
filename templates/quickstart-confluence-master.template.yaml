@@ -39,13 +39,13 @@ Metadata:
           - KeyPairName
           - SSLCertificateARN
       - Label:
-          default: DNS (Optional)
+          default: DNS
         Parameters:
           - CustomDnsName
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster Node Deployment Repository; this is used to install and configure the application.
+          default: Cluster Node Deployment Repository
         Parameters:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
@@ -56,7 +56,7 @@ Metadata:
         Parameters:
           - AutologinCookieAge
       - Label:
-          default: Application Tuning (Optional) - dbref - https://confluence.atlassian.com/doc/performance-tuning-130289.html tomcatref - http://tomcat.apache.org/tomcat-8.0-doc/config/http.html
+          default: Application Tuning
         Parameters:
           - TomcatContextPath
           - CatalinaOpts
@@ -108,7 +108,7 @@ Metadata:
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
-        default: Existing DNS name (optional)
+        default: (Optional) Existing DNS name
       DBAcquireIncrement:
           default: DB Acquire Increment
       DBIdleTestPeriod:
@@ -150,9 +150,9 @@ Metadata:
       DeploymentAutomationPlaybook:
         default: The Ansible playbook to invoke to initialise the instance.
       DeploymentAutomationKeyName:
-        default: SSH keyname to use with the repository (Optional)
+        default: (Optional) SSH keyname to use with the repository
       HostedZone:
-        default: Route 53 Hosted Zone (optional)
+        default: (Optional) Route 53 Hosted Zone
       JvmHeapOverride:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
@@ -164,7 +164,7 @@ Metadata:
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
-        default: Sub-domain for Hosted Zone (optional)
+        default: (Optional) Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -407,7 +407,7 @@ Parameters:
     Type: String
   DBPoolMaxSize:
     Default: 60
-    Description: The maximum number of database connections that can be opened at any time
+    Description: The maximum number of database connections that can be opened at any time. See https://confluence.atlassian.com/doc/performance-tuning-130289.html for reference on tuning database parameters.
     Type: String
   DBPoolMinSize:
     Default: 20
@@ -471,7 +471,7 @@ Parameters:
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
@@ -624,7 +624,7 @@ Parameters:
   TomcatContextPath:
     Default: ''
     AllowedPattern: '^(\/[A-z_\-0-9\.]+)?$'
-    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/"
+    Description: The context path of this web application, which is matched against the beginning of each request URI to select the appropriate web application for processing. If used, must include leading "/".  See http://tomcat.apache.org/tomcat-8.0-doc/config/http.html for reference on tuning tomcat parameters.
     Type: String
   TomcatDefaultConnectorPort:
     Default: 8080
