@@ -45,7 +45,7 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster Node Deployment Repository
+          default: Cluster node deployment repository
         Parameters:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
@@ -56,7 +56,7 @@ Metadata:
         Parameters:
           - AutologinCookieAge
       - Label:
-          default: Application Tuning
+          default: Application tuning
         Parameters:
           - TomcatContextPath
           - CatalinaOpts
@@ -81,7 +81,7 @@ Metadata:
           - TomcatRedirectPort
           - TomcatScheme
       - Label:
-          default: AWS Quick Start Configuration
+          default: AWS Quick Start configuration
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
@@ -108,13 +108,13 @@ Metadata:
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
-        default: (Optional) Existing DNS name
+        default: Existing DNS name
       DBAcquireIncrement:
           default: DB Acquire Increment
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBEngine:
-        default: Database Engine
+        default: Database engine
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -148,23 +148,23 @@ Metadata:
       DeploymentAutomationBranch:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
-        default: The Ansible playbook to invoke to initialise the instance.
+        default: Ansible playbook
       DeploymentAutomationKeyName:
-        default: (Optional) SSH keyname to use with the repository
+        default: SSH key name
       HostedZone:
-        default: (Optional) Route 53 Hosted Zone
+        default: Route 53 Hosted Zone
       JvmHeapOverride:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
       KeyPairName:
-        default: Key Name *
+        default: Key name *
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
-        default: (Optional) Sub-domain for Hosted Zone
+        default: Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -201,7 +201,7 @@ Parameters:
     Default: true
     AllowedValues: [true, false]
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Controls if the EC2 instances are assigned a public IP address
+    Description: Controls if the EC2 instances are assigned a public IP address.
     Type: String
   AutologinCookieAge:
     Default: ''
@@ -209,7 +209,7 @@ Parameters:
     Type: String
   CatalinaOpts:
     Default: ''
-    Description: Pass in any additional JVM options to tune Catalina Tomcat
+    Description: Pass in any additional JVM options to tune Catalina Tomcat.
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -324,7 +324,7 @@ Parameters:
     Type: Number
   ClusterNodeVolumeSize:
     Default: 50
-    Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4)
+    Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4).
     Type: Number
   CollaborativeEditingMode:
     Default: synchrony-separate-nodes
@@ -338,11 +338,11 @@ Parameters:
     Default: '6.13.5'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
     ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
-    Description: The version of Confluence to install
+    Description: The version of Confluence to install.
     Type: String
   CustomDnsName:
     Default: ''
-    Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
+    Description: '(Optional) Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
   DBEngine:
     Default: 'PostgreSQL'
@@ -372,7 +372,7 @@ Parameters:
       - db.t2.xlarge
       - db.t2.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type (must be r4 family if using Amazon Aurora)
+    Description: RDS instance type (must be R4 family if using Amazon Aurora).
     Type: String
   DBIops:
     Default: 1000
@@ -384,13 +384,13 @@ Parameters:
   DBMasterUserPassword:
     AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
     ConstraintDescription: "Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
-    Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol."
     MinLength: 8
     MaxLength: 128
     NoEcho: true
     Type: String
   DBMultiAZ:
-    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'Amazon Aurora PostgreSQL', this will determine whether to provision a single or a multi node Amazon Aurora cluster 
+    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'Amazon Aurora PostgreSQL', this will determine whether to provision a single or a multiple-node Amazon Aurora cluster. 
     Default: true
     AllowedValues:
       - true
@@ -400,7 +400,7 @@ Parameters:
   DBPassword:
     AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
     ConstraintDescription: "Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ ) \" ') symbol"
-    Description: "Password for the user account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    Description: "Password for the user account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol."
     MinLength: 8
     MaxLength: 128
     NoEcho: true
@@ -411,7 +411,7 @@ Parameters:
     Type: String
   DBPoolMinSize:
     Default: 20
-    Description: The minimum number of idle database connections that are kept open at any time
+    Description: The minimum number of idle database connections that are kept open at any time.
     Type: String
   DBTimeout:
     Default: 30
@@ -427,15 +427,15 @@ Parameters:
     Type: String
   DBValidate:
     Default: false
-    Description: If true, a connection test will be performed at every connection checkout to verify that the connection is valid
+    Description: If true, a connection test will be performed at every connection checkout to verify that the connection is valid.
     Type: String
   DBPreferredTestQuery:
     Default: 'select version();'
-    Description: The query that will be executed for all connection tests
+    Description: The query that will be executed for all connection tests.
     Type: String
   DBAcquireIncrement:
     Default: 1
-    Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted
+    Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.
     Type: String
   DBStorage:
     Default: 10
@@ -446,7 +446,7 @@ Parameters:
     AllowedValues:
       - true
       - false
-    Description: Whether or not to encrypt the database
+    Description: Whether or not to encrypt the database.
     Type: String
   DBStorageType:
     Default: General Purpose (SSD)
@@ -459,7 +459,7 @@ Parameters:
   DeploymentAutomationRepository:
     Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
     Type: String
-    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customizations.
   DeploymentAutomationBranch:
     Default: "master"
     Type: String
@@ -467,28 +467,28 @@ Parameters:
   DeploymentAutomationPlaybook:
     Default: "aws_confluence_dc_node.yml"
     Type: String
-    Description: The Ansible playbook to invoke to initialise the application node on first start.
+    Description: The Ansible playbook to invoke to initialize the application node on first start.
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
+    Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
-    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames
+    Description: (Optional) The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames.
     Type: String
   JvmHeapOverride:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
+    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig; e.g., 1024m or 1g.
     Type: String
   JvmHeapOverrideSynchrony:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for Synchrony, for your instance type - set size in meg or gig e.g. 1024m or 1g.
+    Description: Override the default amount of memory to allocate to the JVM for Synchrony, for your instance type - set size in meg or gig; e.g., 1024m or 1g.
     Type: String
   KeyPairName:
     Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances
+    Description: The EC2 Key Pair to allow SSH access to the instances.
     Type: String
   MailEnabled:
     AllowedValues:
@@ -496,10 +496,10 @@ Parameters:
       - false
     ConstraintDescription: Must be 'true' or 'false'.
     Default: true
-    Description: Enable mail processing and sending
+    Description: Enable mail processing and sending.
     Type: String
   SubDomainName:
-    Description: Leave this field blank to use your stack name as the sub-domain.
+    Description: (Optional) Leave this field blank to use your stack name as the sub-domain.
     Default: ''
     Type: String
   SSLCertificateARN:
@@ -510,11 +510,11 @@ Parameters:
     Type: String
 
   SynchronyClusterNodeMax:
-    Description: Maximum number of Synchrony cluster nodes
+    Description: Maximum number of Synchrony cluster nodes.
     Default: 1
     Type: Number
   SynchronyClusterNodeMin:
-    Description: Minimum number of Synchrony cluster nodes
+    Description: Minimum number of Synchrony cluster nodes.
     Default: 1
     Type: Number
   SynchronyNodeInstanceType:
@@ -615,11 +615,11 @@ Parameters:
     Type: String
   TomcatAcceptCount:
     Default: 10
-    Description: The maximum queue length for incoming connection requests when all possible request processing threads are in use
+    Description: The maximum queue length for incoming connection requests when all possible request processing threads are in use.
     Type: String
   TomcatConnectionTimeout:
     Default: 20000
-    Description: The number of milliseconds this Connector will wait, after accepting a connection, for the request URI line to be presented
+    Description: The number of milliseconds this Connector will wait, after accepting a connection, for the request URI line to be presented.
     Type: String
   TomcatContextPath:
     Default: ''
@@ -628,27 +628,27 @@ Parameters:
     Type: String
   TomcatDefaultConnectorPort:
     Default: 8080
-    Description: The port on which to serve the application
+    Description: The port on which to serve the application.
     Type: String
   TomcatEnableLookups:
     Default: false
-    Description: Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in order to return the actual host name of the remote client
+    Description: Set to true if you want calls to request.getRemoteHost() to perform DNS lookups in order to return the actual host name of the remote client.
     Type: String
   TomcatMaxThreads:
     Default: 48
-    Description: The maximum number of request processing threads to be created by this Connector, which therefore determines the maximum number of simultaneous requests that can be handled
+    Description: The maximum number of request processing threads to be created by this Connector, which therefore determines the maximum number of simultaneous requests that can be handled.
     Type: String
   TomcatMinSpareThreads:
     Default: 10
-    Description: The minimum number of threads always kept running
+    Description: The minimum number of threads always kept running.
     Type: String
   TomcatProtocol:
     Default: 'HTTP/1.1'
-    Description: Sets the protocol to handle incoming traffic
+    Description: Sets the protocol to handle incoming traffic.
     Type: String
   TomcatRedirectPort:
     Default: 8443
-    Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI
+    Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI.
     Type: String
   TomcatScheme:
     Default: http
