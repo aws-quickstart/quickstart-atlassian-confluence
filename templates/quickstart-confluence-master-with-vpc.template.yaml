@@ -47,14 +47,14 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster Node Deployment Repository
+          default: Cluster node deployment repository
         Parameters:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
           - DeploymentAutomationKeyName
       - Label:
-          default: Application Tuning
+          default: Application tuning
         Parameters:
           - TomcatContextPath
           - CatalinaOpts
@@ -79,7 +79,7 @@ Metadata:
           - TomcatRedirectPort
           - TomcatScheme
       - Label:
-          default: AWS Quick Start Configuration
+          default: AWS Quick Start configuration
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
@@ -106,11 +106,11 @@ Metadata:
       ConfluenceVersion:
         default: Version *
       CustomDnsName:
-        default: (Optional) Existing DNS name
+        default: Existing DNS name
       DBAcquireIncrement:
           default: DB Acquire Increment
       DBEngine:
-        default: Database Engine
+        default: Database engine
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBInstanceClass:
@@ -146,23 +146,23 @@ Metadata:
       DeploymentAutomationBranch:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
-        default: The Ansible playbook to invoke to initialise the instance.
+        default: Ansible playbook
       DeploymentAutomationKeyName:
-        default: (Optional) SSH keyname to use with the repository
+        default: SSH key name
       HostedZone:
-        default: (Optional) Route 53 Hosted Zone
+        default: Route 53 Hosted Zone
       JvmHeapOverride:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
       KeyPairName:
-        default: Key Name *
+        default: Key name *
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
         default: SSL Certificate ARN
       SubDomainName:
-        default: (Optional)Sub-domain for Hosted Zone
+        default: Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -199,7 +199,7 @@ Parameters:
     Default: true
     AllowedValues: [true, false]
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Controls if the EC2 instances are assigned a public IP address
+    Description: Controls if the EC2 instances are assigned a public IP address.
     Type: String
   CatalinaOpts:
     Default: ''
@@ -336,7 +336,7 @@ Parameters:
     Type: String
   CustomDnsName:
     Default: ''
-    Description: 'Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
+    Description: '(Optional) Use custom existing DNS name for your Data Center instance. This will take precedence over HostedZone. Please note: you must own the domain and configure it to point at the load balancer.'
     Type: String
   DBEngine:
     Default: 'PostgreSQL'
@@ -366,7 +366,7 @@ Parameters:
       - db.t2.xlarge
       - db.t2.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list.
-    Description: RDS instance type (must be r4 family if using Amazon Aurora).
+    Description: RDS instance type (must be R4 family if using Amazon Aurora).
     Type: String
   DBIops:
     Default: 1000
@@ -378,13 +378,13 @@ Parameters:
   DBMasterUserPassword:
     AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
     ConstraintDescription: "Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
-    Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol."
     MinLength: 8
     MaxLength: 128
     NoEcho: true
     Type: String
   DBMultiAZ:
-    Description: Whether to provision a multi-AZ RDS instance.
+    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'Amazon Aurora PostgreSQL', this will determine whether to provision a single or a multiple-node Amazon Aurora cluster.
     Default: true
     AllowedValues:
       - true
@@ -394,7 +394,7 @@ Parameters:
   DBPassword:
     AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
     ConstraintDescription: "Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
-    Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    Description: "Password for the user account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol."
     MinLength: 8
     MaxLength: 128
     NoEcho: true
@@ -453,7 +453,7 @@ Parameters:
   DeploymentAutomationRepository:
     Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
     Type: String
-    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+    Description: The deployment automation repository to use for per-node initialization. Leave this as default unless you have customizations.
   DeploymentAutomationBranch:
     Default: "master"
     Type: String
@@ -461,15 +461,15 @@ Parameters:
   DeploymentAutomationPlaybook:
     Default: "aws_confluence_dc_node.yml"
     Type: String
-    Description: The Ansible playbook to invoke to initialise the application node on first start.
+    Description: The Ansible playbook to invoke to initialize the application node on first start.
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
+    Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
-    Description: The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames.
+    Description: (Optional) The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames.
     Type: String
   JvmHeapOverride:
     Default: ''
@@ -493,7 +493,7 @@ Parameters:
     Description: Enable mail processing and sending.
     Type: String
   SubDomainName:
-    Description: Leave this field blank to use your stack name as the sub-domain.
+    Description: (Optional) Leave this field blank to use your stack name as the sub-domain.
     Default: ''
     Type: String
   SSLCertificateARN:
@@ -503,11 +503,11 @@ Parameters:
     MaxLength: 90
     Type: String
   SynchronyClusterNodeMax:
-    Description: Maximum number of Synchrony cluster nodes
+    Description: Maximum number of Synchrony cluster nodes.
     Default: 1
     Type: Number
   SynchronyClusterNodeMin:
-    Description: Minimum number of Synchrony cluster nodes
+    Description: Minimum number of Synchrony cluster nodes.
     Default: 1
     Type: Number
   SynchronyNodeInstanceType:
@@ -645,14 +645,14 @@ Parameters:
     Type: String
   TomcatScheme:
     Default: http
-    Description: "The name of the protocol you wish to have returned, ie 'https' for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately."
+    Description: "The name of the protocol you wish to have returned, i.e., 'https' for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately."
     Type: String
     AllowedValues: [http, https]
 
   # VPC parameters
   AvailabilityZones:
-    Description: 'List of Availability Zones to use for the subnets in the VPC. Note: You must specify 2 AZs here; 
-      if more are specified only the first 2 will be used.'
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note: You must specify 2 Availability Zones here; 
+      if more are specified, only the first 2 will be used.'
     Type: List<AWS::EC2::AvailabilityZone::Name>
   QSS3BucketName:
     Default: 'aws-quickstart'

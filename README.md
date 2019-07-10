@@ -9,8 +9,7 @@ This Quick Start uses the [Atlassian Standard Infrastructure (ASI)](https://fwd.
 
 ![Quick Start architecture for Confluence on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/confluence-on-aws-architecture.png)
 
-For architectural details, best practices, step-by-step instructions, and customization options, see the 
-[deployment guide](https://fwd.aws/kBpWN).
+This Quick Start supports the use of either Amazon Relational Database Service (Amazon RDS) for PostgreSQL, which is the default, or Amazon Aurora PostgreSQL. For architectural details, best practices, step-by-step instructions, and customization options, see the [deployment guide](https://fwd.aws/kBpWN).
 
 ### Network prerequisites
 
