@@ -34,8 +34,8 @@ Metadata:
       - Label:
           default: Networking
         Parameters:
-          - AssociatePublicIpAddress
           - CidrBlock
+          - InternetFacingLoadBalancer
           - KeyPairName
           - SSLCertificateARN
       - Label:
@@ -87,8 +87,6 @@ Metadata:
           - QSS3KeyPrefix
 
     ParameterLabels:
-      AssociatePublicIpAddress:
-        default: Assign public IP
       AutologinCookieAge:
         default: Remember Me cookie expiry
       CatalinaOpts:
@@ -153,6 +151,8 @@ Metadata:
         default: SSH key name
       HostedZone:
         default: Route 53 Hosted Zone
+      InternetFacingLoadBalancer:
+        default: Make instance internet facing
       JvmHeapOverride:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
@@ -197,12 +197,6 @@ Metadata:
         default: Quick Start S3 Key Prefix
 
 Parameters:
-  AssociatePublicIpAddress:
-    Default: true
-    AllowedValues: [true, false]
-    ConstraintDescription: Must be 'true' or 'false'.
-    Description: Controls if the EC2 instances are assigned a public IP address.
-    Type: String
   AutologinCookieAge:
     Default: ''
     Description: Sets the Remember Me (autologin) cookie expiry length in seconds. If blank this defaults to 1 year.
@@ -477,6 +471,12 @@ Parameters:
     ConstraintDescription: Must be the name of an existing Route53 Hosted Zone.
     Description: (Optional) The domain name of the Route53 PRIVATE Hosted Zone in which to create cnames.
     Type: String
+  InternetFacingLoadBalancer:
+    Default: true
+    AllowedValues: [true, false]
+    ConstraintDescription: Must be 'true' or 'false'.
+    Description: Controls if the load balancer is deployed as internet-facing (visible to all on internet) or internal (private to VPC).
+    Type: String
   JvmHeapOverride:
     Default: ''
     Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig; e.g., 1024m or 1g.
@@ -695,7 +695,7 @@ Conditions:
   UseHostedZone:
     !Not [!Equals [!Ref HostedZone, '']]
   UsePublicIp:
-    !Equals [!Ref AssociatePublicIpAddress, 'true']
+    !Equals [!Ref InternetFacingLoadBalancer, 'true']
   UseSubDomainName:
     !Not [!Equals [!Ref SubDomainName, '']]
   UseSynchronyAutoScalingGroup:
