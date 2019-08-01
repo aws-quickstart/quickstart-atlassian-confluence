@@ -16,9 +16,17 @@ global:
     - us-west-2
   reporting: true
 
+# By default we are running only single test. By uncommenting additional tests, you can run different scenarios.
+# Taskcat currently doesn't support scenario selection.
 tests:
   confluence:
     parameter_input: quickstart-confluence-master-parms.json
     template_file: quickstart-confluence-master-with-vpc.template.yaml
     regions:
      - us-east-1
+
+#  confluence-aurora:
+#    parameter_input: quickstart-confluence-aurora.json
+#    template_file: quickstart-confluence-master.template.yaml
+#    regions:
+#      - ap-southeast-2

@@ -1,46 +1,46 @@
 [
-    {
-        "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[taskcat_genaz_2]"
-    },
-    {
-        "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "$[taskcat_genpass_8S]"
-    },
-    {
-        "ParameterKey": "DBMultiAZ",
-        "ParameterValue": "false"
-    },
-    {
-        "ParameterKey": "DBPassword",
-        "ParameterValue": "$[taskcat_genpass_8S]"
-    },
-    {
-        "ParameterKey": "DBStorage",
-        "ParameterValue": "100"
-    },
-    {
-        "ParameterKey": "DBStorageType",
-        "ParameterValue": "Provisioned IOPS"
-    },
-    {
-        "ParameterKey": "CustomDnsName",
-        "ParameterValue": "qs-conf-ci.awsqs.com"
-    },
-    {
-        "ParameterKey":"CidrBlock",
-        "ParameterValue":"10.0.0.0/16"
-    },
-    {
-        "ParameterKey":"QSS3BucketName",
-        "ParameterValue":"$[taskcat_autobucket]"
-    },
-    {
-        "ParameterKey":"QSS3KeyPrefix",
-        "ParameterValue":"quickstart-atlassian-confluence/"
-    },
-    {
-        "ParameterKey": "KeyPairName",
-        "ParameterValue": "replaced-by-taskcat-override-file"
-    }
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "$[taskcat_genaz_2]"
+  },
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
+    "ParameterKey": "DBMultiAZ",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
+    "ParameterKey": "DBStorage",
+    "ParameterValue": "100"
+  },
+  {
+    "ParameterKey": "DBStorageType",
+    "ParameterValue": "Provisioned IOPS"
+  },
+  {
+    "ParameterKey": "CustomDnsName",
+    "ParameterValue": "qs-conf-ci.awsqs.com"
+  },
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "quickstart-atlassian-confluence/"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "replaced-by-taskcat-override-file"
+  }
 ]
