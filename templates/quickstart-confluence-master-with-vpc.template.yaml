@@ -315,12 +315,12 @@ Parameters:
     Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4).
     Type: Number
   CollaborativeEditingMode:
-    Default: synchrony-separate-nodes
+    Default: synchrony-local
     AllowedValues:
       - none
       - synchrony-local
       - synchrony-separate-nodes
-    Description: Collaborative Editing can be off, run locallly on the Confluence nodes (leave 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
+    Description: Collaborative Editing can be off, run locallly on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
   ConfluenceVersion:
     Default: '6.13.5'
