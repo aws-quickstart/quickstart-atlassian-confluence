@@ -203,7 +203,7 @@ Parameters:
     Type: String
   CatalinaOpts:
     Default: ''
-    Description: Pass in any additional JVM options to tune Catalina Tomcat.
+    Description: Java options that are passed to the Java virtual machine (JVM) that runs Confluence.
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -479,11 +479,11 @@ Parameters:
     Type: String
   JvmHeapOverride:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig; e.g., 1024m or 1g.
+    Description: The heap size to use, in MB (e.g., 1024m) or GB (e.g., 1g), to override the default amount of memory to allocate to the JVM for your instance type.
     Type: String
   JvmHeapOverrideSynchrony:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for Synchrony, for your instance type - set size in meg or gig; e.g., 1024m or 1g.
+    Description: The heap size to use, in MB (e.g., 1024m) or GB (e.g., 1g), to override the default amount of memory to allocate to the JVM for your instance type.
     Type: String
   KeyPairName:
     Default: ''
