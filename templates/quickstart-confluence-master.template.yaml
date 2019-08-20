@@ -1104,7 +1104,6 @@ Resources:
     DependsOn:
       - EFSMountAz1
       - EFSMountAz2
-      - DB
     Metadata:
       AWS::CloudFormation::Init:
         config:
@@ -1222,7 +1221,6 @@ Resources:
           Ebs:
             VolumeSize: !Ref ClusterNodeVolumeSize
         - DeviceName: /dev/xvdf
-          Ebs: {}
           NoDevice: true
       KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
@@ -1318,7 +1316,6 @@ Resources:
     DependsOn:
       - EFSMountAz1
       - EFSMountAz2
-      - DB
     Metadata:
       AWS::CloudFormation::Init:
         config:
@@ -1406,7 +1403,7 @@ Resources:
               command: /opt/atlassian/bin/clone_deployment_repo
               ignoreErrors: true
             080_run_atl_init_node:
-              command: !Sub |
+              command:
                 cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_confluence_synchrony_node.yml /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
@@ -1414,7 +1411,6 @@ Resources:
       AssociatePublicIpAddress: false
       BlockDeviceMappings:
         - DeviceName: /dev/xvdf
-          Ebs: {}
           NoDevice: true
       KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
