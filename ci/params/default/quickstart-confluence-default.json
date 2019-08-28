@@ -1,0 +1,38 @@
+[
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "$[taskcat_genpass_8A]#"
+  },
+  {
+    "ParameterKey": "DBMultiAZ",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "$[taskcat_genpass_8A]#"
+  },
+  {
+    "ParameterKey": "DBStorage",
+    "ParameterValue": "100"
+  },
+  {
+    "ParameterKey": "DBStorageType",
+    "ParameterValue": "Provisioned IOPS"
+  },
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "quickstart-atlassian-confluence/"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "replaced-by-taskcat-override-file"
+  }
+]
