@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "DBMasterUserPassword",
-    "ParameterValue": "f925dO1ry@"
+    "ParameterValue": "f925dO1ry_"
   },
   {
     "ParameterKey": "DBMultiAZ",
@@ -9,7 +9,7 @@
   },
   {
     "ParameterKey": "DBPassword",
-    "ParameterValue": "f925dO1ry@"
+    "ParameterValue": "f925dO1ry_"
   },
   {
     "ParameterKey": "DBStorage",
