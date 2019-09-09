@@ -1,9 +1,5 @@
 [
   {
-    "ParameterKey": "AvailabilityZones",
-    "ParameterValue": "$[taskcat_genaz_2]"
-  },
-  {
     "ParameterKey": "DBMasterUserPassword",
     "ParameterValue": "f925dO1ry_"
   },
@@ -24,12 +20,8 @@
     "ParameterValue": "Provisioned IOPS"
   },
   {
-    "ParameterKey": "CustomDnsName",
-    "ParameterValue": "qs-conf-ci.awsqs.com"
-  },
-  {
     "ParameterKey": "CidrBlock",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "QSS3BucketName",
