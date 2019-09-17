@@ -45,6 +45,6 @@
     },
     {
         "ParameterKey": "DBInstanceClass",
-        "ParameterValue": "db.t3.medium"
+        "ParameterValue": "db.t2.medium"
     }
 ]
