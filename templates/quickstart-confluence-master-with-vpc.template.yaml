@@ -20,6 +20,10 @@ Metadata:
           - SynchronyClusterNodeMax
           - SynchronyClusterNodeMin
           - SynchronyNodeInstanceType
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
       - Label:
           default: Database
         Parameters:
@@ -46,13 +50,6 @@ Metadata:
           - CustomDnsName
           - HostedZone
           - SubDomainName
-      - Label:
-          default: Cluster node deployment repository
-        Parameters:
-          - DeploymentAutomationRepository
-          - DeploymentAutomationBranch
-          - DeploymentAutomationPlaybook
-          - DeploymentAutomationKeyName
       - Label:
           default: Application tuning
         Parameters:
