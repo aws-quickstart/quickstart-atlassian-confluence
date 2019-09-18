@@ -12,6 +12,7 @@ Metadata:
       - Label:
           default: Cluster nodes
         Parameters:
+          - CloudWatchIntegration
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
@@ -145,6 +146,8 @@ Metadata:
         default: Ansible playbook
       DeploymentAutomationKeyName:
         default: SSH key name
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       HostedZone:
         default: Route 53 Hosted Zone
       InternetFacingLoadBalancer:
@@ -460,6 +463,12 @@ Parameters:
     Default: ""
     Type: String
     Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Amazon Route 53 Hosted Zone.
