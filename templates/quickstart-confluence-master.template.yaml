@@ -480,10 +480,9 @@ Parameters:
     Description: The heap size to use, in MB (e.g., 1024m) or GB (e.g., 1g), to override the default amount of memory to allocate to the JVM for your instance type.
     Type: String
   KeyPairName:
-    Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances.
-    Type: String
+    Type: AWS::EC2::KeyPair::KeyName
   MailEnabled:
     AllowedValues:
       - true
@@ -669,6 +668,10 @@ Conditions:
     !Not [!Equals [!Ref MailEnabled, true]]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
+  EnableCloudWatch:
+    !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
+  EnableCloudWatchLogs:
+    !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
   KeyProvided:
     !Not [!Equals [!Ref KeyPairName, '']]
   OverrideHeap:
@@ -1160,6 +1163,9 @@ Resources:
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
