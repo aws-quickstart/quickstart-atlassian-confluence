@@ -681,8 +681,6 @@ Conditions:
     !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
   EnableCloudWatchLogs:
     !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
-  KeyProvided:
-    !Not [!Equals [!Ref KeyPairName, '']]
   OverrideHeap:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
@@ -1224,7 +1222,7 @@ Resources:
             VolumeSize: !Ref ClusterNodeVolumeSize
         - DeviceName: /dev/xvdf
           NoDevice: true
-      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
+      KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap
