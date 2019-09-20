@@ -491,7 +491,8 @@ Parameters:
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances.
-    Type: AWS::EC2::KeyPair::KeyName
+    Type: String
+    Default: ''
   MailEnabled:
     AllowedValues:
       - true
@@ -681,6 +682,8 @@ Conditions:
     !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
   EnableCloudWatchLogs:
     !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
+  KeyProvided:
+    !Not [!Equals [!Ref KeyPairName, '']]
   OverrideHeap:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
@@ -1223,7 +1226,7 @@ Resources:
             VolumeSize: !Ref ClusterNodeVolumeSize
         - DeviceName: /dev/xvdf
           NoDevice: true
-      KeyName: !Ref KeyPairName
+      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap
