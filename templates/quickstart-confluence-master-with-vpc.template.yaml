@@ -24,6 +24,7 @@ Metadata:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
+          - DeploymentAutomationCustomParams
           - DeploymentAutomationKeyName
       - Label:
           default: Database
@@ -142,6 +143,8 @@ Metadata:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
         default: Ansible playbook
+      DeploymentAutomationCustomParams:
+        default: Custom command-line parameters for Ansible. (Optional)
       DeploymentAutomationKeyName:
         default: SSH key name
       CloudWatchIntegration:
@@ -453,6 +456,10 @@ Parameters:
     Default: "aws_confluence_dc_node.yml"
     Type: String
     Description: The Ansible playbook to invoke to initialize the application node on first start.
+  DeploymentAutomationCustomParams:
+    Default: ""
+    Type: String
+    Description: Additional command-line options for the `ansible-playbook` command. See the repository README for more details. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
@@ -742,6 +749,7 @@ Resources:
         DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
+        DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
         CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         HostedZone: !Ref 'HostedZone'
         JvmHeapOverride: !Ref 'JvmHeapOverride'
