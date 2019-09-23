@@ -1737,6 +1737,21 @@ Resources:
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
+# Optional: CloudWatch dashboard to be created when CloudWatch is enabled
+  CloudWatchDashboard:
+    DependsOn:
+      - DB
+    Condition: EnableCloudWatch
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-cloudwatch-dashboard.yaml
+        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+      Parameters:
+        ProductStackName: !Sub "${AWS::StackName}"
+        ProductFamilyName: "confluence"
+        AsgToMonitor: !Ref ClusterNodeGroup
+        DatabaseIdentifier: !Sub ["${DBStackNamePrefix}-db", {DBStackNamePrefix: !Ref 'AWS::StackName'}]
 
 Outputs:
   ServiceURL:
@@ -1796,3 +1811,7 @@ Outputs:
       - UseSynchronyAutoScalingGroup
       - !Ref SynchronyClusterNodeGroup
       - 'local'
+  CloudWatchDashboardURL:
+    Description: CloudWatch monitoring dashboard URL
+    Value: !GetAtt CloudWatchDashboard.Outputs.Dashboard
+    Condition: EnableCloudWatch
