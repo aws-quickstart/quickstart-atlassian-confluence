@@ -12,6 +12,7 @@ Metadata:
       - Label:
           default: Cluster nodes
         Parameters:
+          - CloudWatchIntegration
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
@@ -19,6 +20,10 @@ Metadata:
           - SynchronyClusterNodeMax
           - SynchronyClusterNodeMin
           - SynchronyNodeInstanceType
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
       - Label:
           default: Database
         Parameters:
@@ -44,13 +49,6 @@ Metadata:
           - CustomDnsName
           - HostedZone
           - SubDomainName
-      - Label:
-          default: Cluster node deployment repository
-        Parameters:
-          - DeploymentAutomationRepository
-          - DeploymentAutomationBranch
-          - DeploymentAutomationPlaybook
-          - DeploymentAutomationKeyName
       - Label:
           default: Advanced (Optional)
         Parameters:
@@ -148,6 +146,8 @@ Metadata:
         default: Ansible playbook
       DeploymentAutomationKeyName:
         default: SSH key name
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       HostedZone:
         default: Route 53 Hosted Zone
       InternetFacingLoadBalancer:
@@ -346,18 +346,34 @@ Parameters:
   DBInstanceClass:
     Default: db.m4.large
     AllowedValues:
+      - db.m5.large
+      - db.m5.xlarge
+      - db.m5.2xlarge
+      - db.m5.4xlarge
+      - db.m5.12xlarge
+      - db.m5.24xlarge
       - db.m4.large
       - db.m4.xlarge
       - db.m4.2xlarge
       - db.m4.4xlarge
       - db.m4.10xlarge
       - db.m4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
       - db.r4.large
       - db.r4.xlarge
       - db.r4.2xlarge
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
       - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
@@ -463,6 +479,12 @@ Parameters:
     Default: ""
     Type: String
     Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Amazon Route 53 Hosted Zone.
@@ -483,10 +505,10 @@ Parameters:
     Description: The heap size to use, in MB (e.g., 1024m) or GB (e.g., 1g), to override the default amount of memory to allocate to the JVM for your instance type.
     Type: String
   KeyPairName:
-    Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances.
     Type: String
+    Default: ''
   MailEnabled:
     AllowedValues:
       - true
@@ -672,6 +694,10 @@ Conditions:
     !Not [!Equals [!Ref MailEnabled, true]]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
+  EnableCloudWatch:
+    !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
+  EnableCloudWatchLogs:
+    !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
   KeyProvided:
     !Not [!Equals [!Ref KeyPairName, '']]
   OverrideHeap:
@@ -1029,6 +1055,7 @@ Resources:
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
       Path: /
       Policies:
         - PolicyName: ConfluenceClusterNodePolicy
@@ -1163,6 +1190,9 @@ Resources:
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -1356,6 +1386,9 @@ Resources:
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                     - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
+                    - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -1704,6 +1737,21 @@ Resources:
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
+# Optional: CloudWatch dashboard to be created when CloudWatch is enabled
+  CloudWatchDashboard:
+    DependsOn:
+      - DB
+    Condition: EnableCloudWatch
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-cloudwatch-dashboard.yaml
+        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+      Parameters:
+        ProductStackName: !Sub "${AWS::StackName}"
+        ProductFamilyName: "confluence"
+        AsgToMonitor: !Ref ClusterNodeGroup
+        DatabaseIdentifier: !Sub ["${DBStackNamePrefix}-db", {DBStackNamePrefix: !Ref 'AWS::StackName'}]
 
 Outputs:
   ServiceURL:
@@ -1763,3 +1811,7 @@ Outputs:
       - UseSynchronyAutoScalingGroup
       - !Ref SynchronyClusterNodeGroup
       - 'local'
+  CloudWatchDashboardURL:
+    Description: CloudWatch monitoring dashboard URL
+    Value: !GetAtt CloudWatchDashboard.Outputs.Dashboard
+    Condition: EnableCloudWatch
