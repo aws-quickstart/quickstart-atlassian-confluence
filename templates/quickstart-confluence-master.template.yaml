@@ -160,7 +160,7 @@ Metadata:
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
       KeyPairName:
-        default: Key name *
+        default: SSH Key Pair Name (optional)
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
@@ -485,7 +485,7 @@ Parameters:
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
+    Description: (Optional) Named Key Pair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
   CloudWatchIntegration:
     Default: "Metrics and Logs"
     Type: String
@@ -513,7 +513,7 @@ Parameters:
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances.
+    Description: The EC2 Key Pair to allow SSH access to the instances. If empty the key pair from Atlassian Standard Infrastructure stack will be used.
     Type: String
     Default: ''
   MailEnabled:
