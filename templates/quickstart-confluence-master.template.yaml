@@ -146,9 +146,9 @@ Metadata:
       DeploymentAutomationPlaybook:
         default: Ansible playbook
       DeploymentAutomationCustomParams:
-        default: Custom command-line parameters for Ansible. (Optional)
+        default: Custom command-line parameters for Ansible
       DeploymentAutomationKeyName:
-        default: SSH key name
+        default: SSH keyname to use with the repository
       CloudWatchIntegration:
         default: Enable CloudWatch integration
       HostedZone:
@@ -160,7 +160,7 @@ Metadata:
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
       KeyPairName:
-        default: SSH Key Pair Name (optional)
+        default: SSH Key Pair Name
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
@@ -400,7 +400,7 @@ Parameters:
     NoEcho: true
     Type: String
   DBMultiAZ:
-    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'Amazon Aurora PostgreSQL', this will determine whether to provision a single or a multiple-node Amazon Aurora cluster. 
+    Description: When DBEngine is 'PostgreSQL', this will determine whether to provision a multi-AZ RDS instance. When DBEngine is 'Amazon Aurora PostgreSQL', this will determine whether to provision a single or a multiple-node Amazon Aurora cluster.
     Default: true
     AllowedValues:
       - true
@@ -481,11 +481,11 @@ Parameters:
   DeploymentAutomationCustomParams:
     Default: ""
     Type: String
-    Description: Additional command-line options for the `ansible-playbook` command. See the repository README for more details. (Optional)
+    Description: Additional command-line options for the `ansible-playbook` command. See https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md for more information about overriding parameters. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: (Optional) Named Key Pair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
+    Description: Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   CloudWatchIntegration:
     Default: "Metrics and Logs"
     Type: String
@@ -513,7 +513,7 @@ Parameters:
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances. If empty the key pair from Atlassian Standard Infrastructure stack will be used.
+    Description: The EC2 Key Pair to allow SSH access to the instances. If you don't provide one, the Atlassian Standard Infrastructure stack's key pair will be used.
     Type: String
     Default: ''
   MailEnabled:
