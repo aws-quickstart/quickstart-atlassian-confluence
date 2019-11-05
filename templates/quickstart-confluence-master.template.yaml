@@ -432,7 +432,7 @@ Parameters:
     Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.
     Type: String
   DBStorage:
-    Default: 10
+    Default: 200
     Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Amazon Aurora.
     Type: Number
   DBStorageEncrypted:
