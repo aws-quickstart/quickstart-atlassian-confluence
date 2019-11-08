@@ -13,6 +13,7 @@ Metadata:
       - Label:
           default: Cluster nodes
         Parameters:
+          - CloudWatchIntegration
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
@@ -20,6 +21,11 @@ Metadata:
           - SynchronyClusterNodeMax
           - SynchronyClusterNodeMin
           - SynchronyNodeInstanceType
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationCustomParams
+          - DeploymentAutomationKeyName
       - Label:
           default: Database
         Parameters:
@@ -47,13 +53,6 @@ Metadata:
           - HostedZone
           - SubDomainName
       - Label:
-          default: Cluster node deployment repository
-        Parameters:
-          - DeploymentAutomationRepository
-          - DeploymentAutomationBranch
-          - DeploymentAutomationPlaybook
-          - DeploymentAutomationKeyName
-      - Label:
           default: Application tuning
         Parameters:
           - TomcatContextPath
@@ -77,7 +76,6 @@ Metadata:
           - TomcatMinSpareThreads
           - TomcatProtocol
           - TomcatRedirectPort
-          - TomcatScheme
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -145,8 +143,12 @@ Metadata:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
         default: Ansible playbook
+      DeploymentAutomationCustomParams:
+        default: Custom command-line parameters for Ansible
       DeploymentAutomationKeyName:
-        default: SSH key name
+        default: SSH keyname to use with the repository
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       HostedZone:
         default: Route 53 Hosted Zone
       InternetFacingLoadBalancer:
@@ -156,7 +158,7 @@ Metadata:
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
       KeyPairName:
-        default: Key name *
+        default: SSH Key Pair Name
       MailEnabled:
         default: Enable App to Process Email
       SSLCertificateARN:
@@ -187,8 +189,6 @@ Metadata:
         default: Tomcat Protocol
       TomcatRedirectPort:
         default: Tomcat Redirect Port
-      TomcatScheme:
-        default: Tomcat protocol Scheme
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
@@ -343,18 +343,34 @@ Parameters:
   DBInstanceClass:
     Default: db.m4.large
     AllowedValues:
+      - db.m5.large
+      - db.m5.xlarge
+      - db.m5.2xlarge
+      - db.m5.4xlarge
+      - db.m5.12xlarge
+      - db.m5.24xlarge
       - db.m4.large
       - db.m4.xlarge
       - db.m4.2xlarge
       - db.m4.4xlarge
       - db.m4.10xlarge
       - db.m4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
       - db.r4.large
       - db.r4.xlarge
       - db.r4.2xlarge
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
       - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
@@ -370,8 +386,10 @@ Parameters:
     MaxValue: 30000
     Type: Number
   DBMasterUserPassword:
-    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
-    ConstraintDescription: "Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    AllowedPattern: >-
+      ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: >-
+      Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     Description: "Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol."
     MinLength: 8
     MaxLength: 128
@@ -456,10 +474,20 @@ Parameters:
     Default: "aws_confluence_dc_node.yml"
     Type: String
     Description: The Ansible playbook to invoke to initialize the application node on first start.
+  DeploymentAutomationCustomParams:
+    Default: ""
+    Type: String
+    Description: Additional command-line options for the `ansible-playbook` command. See https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md for more information about overriding parameters. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: (Optional) Named KeyPair name to use with this repository. The key should be imported into the AWS Systems Manager parameter store.
+    Description: Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Amazon Route 53 Hosted Zone.
@@ -480,10 +508,10 @@ Parameters:
     Description: The heap size to use, in MiB (e.g., 1024m) or GiB (e.g., 1g), to override the default amount of memory to allocate to the JVM for Synchrony.
     Type: String
   KeyPairName:
-    Default: ''
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances.
+    Description: The EC2 Key Pair to allow SSH access to the instances. If you don't provide one, the Atlassian Standard Infrastructure stack's key pair will be used.
     Type: String
+    Default: ''
   MailEnabled:
     AllowedValues:
       - true
@@ -643,15 +671,10 @@ Parameters:
     Default: 8443
     Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI.
     Type: String
-  TomcatScheme:
-    Default: http
-    Description: "The name of the protocol you wish to have returned, i.e., 'https' for an SSL Connector. The value of this setting also configures Tomcat's proxy port (443/80) and secure (true/false) settings appropriately."
-    Type: String
-    AllowedValues: [http, https]
 
   # VPC parameters
   AvailabilityZones:
-    Description: 'List of Availability Zones to use for the subnets in the VPC. Note: You must specify 2 Availability Zones here; 
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note: You must specify 2 Availability Zones here;
       if more are specified, only the first 2 will be used.'
     Type: List<AWS::EC2::AvailabilityZone::Name>
   QSS3BucketName:
@@ -744,6 +767,8 @@ Resources:
         DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
+        DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
+        CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         HostedZone: !Ref 'HostedZone'
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmHeapOverrideSynchrony: !Ref 'JvmHeapOverrideSynchrony'
@@ -763,7 +788,6 @@ Resources:
         TomcatMinSpareThreads: !Ref 'TomcatMinSpareThreads'
         TomcatProtocol: !Ref 'TomcatProtocol'
         TomcatRedirectPort: !Ref 'TomcatRedirectPort'
-        TomcatScheme: !Ref 'TomcatScheme'
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
 
