@@ -450,7 +450,7 @@ Parameters:
     Description: Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted.
     Type: String
   DBStorage:
-    Default: 10
+    Default: 200
     Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Amazon Aurora.
     Type: Number
   DBStorageEncrypted:
@@ -1218,7 +1218,7 @@ Resources:
                     # Ensure awscli is up to date
                     yum install -y awscli jq
                     key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
-                    echo -e $key_val > $key_location
+                    echo -e "$key_val" > $key_location
                     chmod 600 $key_location
                     export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
                 else
@@ -1415,7 +1415,7 @@ Resources:
                     # Ensure awscli is up to date
                     yum install -y awscli jq
                     key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
-                    echo -e $key_val > $key_location
+                    echo -e "$key_val" > $key_location
                     chmod 600 $key_location
                     export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
                 else
