@@ -7,7 +7,7 @@ Confluence is team collaboration software that changes how modern teams work. Co
 
 This Quick Start uses the [Atlassian Standard Infrastructure (ASI)](https://fwd.aws/xYyYy) as a foundation. You can choose to build a new ASI for your deployment or deploy Confluence into your existing ASI. You can also deploy Jira and Bitbucket Data Center within the same ASI.
 
-![Quick Start architecture for Confluence on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/confluence-on-aws-architecture.png)
+![Quick Start architecture for Confluence on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/confluence-architecture-on-aws.5508e6ae56624048d452932c364e53f554b732b6.png)
 
 This Quick Start supports the use of either Amazon Relational Database Service (Amazon RDS) for PostgreSQL, which is the default, or Amazon Aurora PostgreSQL. For architectural details, best practices, step-by-step instructions, and customization options, see the [deployment guide](https://fwd.aws/kBpWN).
 
