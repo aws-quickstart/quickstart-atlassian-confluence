@@ -1045,7 +1045,10 @@ Mappings:
       HVM64: ami-015954d5e5548d13b
     us-west-2:
       HVM64: ami-0cb72367e98845d43
-      HVMG2: NOT_SUPPORTED
+    us-gov-west-1:
+      HVM64: ami-e9a9d388
+    us-gov-east-1:
+      HVM64: ami-a2d938d3
 
 Resources:
   ConfluenceClusterNodeRole:
@@ -1059,8 +1062,8 @@ Resources:
               Service: [ec2.amazonaws.com]
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
       Path: /
       Policies:
         - PolicyName: ConfluenceClusterNodePolicy
@@ -1077,28 +1080,28 @@ Resources:
                 - "route53:ChangeResourceRecordSets"
                 Effect: Allow
                 Resource:
-                  - "arn:aws:route53:::healthcheck/*"
-                  - "arn:aws:route53:::change/*"
-                  - "arn:aws:route53:::hostedzone/*"
-                  - "arn:aws:route53:::delegationset/*"
+                  - !Sub "arn:${AWS::Partition}:route53:::healthcheck/*"
+                  - !Sub "arn:${AWS::Partition}:route53:::change/*"
+                  - !Sub "arn:${AWS::Partition}:route53:::hostedzone/*"
+                  - !Sub "arn:${AWS::Partition}:route53:::delegationset/*"
               - Action: ['s3:ListBucket']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/aws-deployment-test/releases/confluence']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence']
               - Action: ['s3:Get*']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/aws-deployment-test/releases/confluence/*']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence/*']
               - Action: ['s3:ListBucket']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/atlassian-software/releases/confluence']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence']
               - Action: ['s3:Get*']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/atlassian-software/releases/confluence/*']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence/*']
               - Action: ['s3:ListBucket']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/atlassian-software/snapshots/confluence']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence']
               - Action: ['s3:Get*']
                 Effect: Allow
-                Resource: ['arn:aws:s3:::/atlassian-software/snapshots/confluence/*']
+                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence/*']
   ConfluenceClusterNodeInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
