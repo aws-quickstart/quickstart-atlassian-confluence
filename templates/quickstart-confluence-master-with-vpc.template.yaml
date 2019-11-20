@@ -727,6 +727,7 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref 'AvailabilityZones'
+        ExportPrefix: !Ref 'ExportPrefix'
         KeyPairName: !Ref 'KeyPairName'
 
   ConfluenceStack:
