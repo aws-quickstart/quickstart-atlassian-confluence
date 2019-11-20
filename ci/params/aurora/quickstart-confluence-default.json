@@ -1,0 +1,38 @@
+[
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "DBMultiAZ",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "DBEngine",
+    "ParameterValue": "Amazon Aurora PostgreSQL"
+  },
+  {
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.r4.large"
+  },
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "0.0.0.0/0"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "quickstart-atlassian-confluence/"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "replaced-by-taskcat-override-file"
+  }
+]
