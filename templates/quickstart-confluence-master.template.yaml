@@ -1584,8 +1584,8 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBAllocatedStorage: !Ref DBStorage
         DBStorageEncrypted: !Ref DBStorageEncrypted
-        ExportPrefix: !Ref ExportPrefix
         DBStorageType: !Ref DBStorageType
+        ExportPrefix: !Ref ExportPrefix
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   DBCname:
