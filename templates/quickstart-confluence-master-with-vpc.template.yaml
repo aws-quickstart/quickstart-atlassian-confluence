@@ -81,6 +81,7 @@ Metadata:
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
+          - ExportPrefix
 
     ParameterLabels:
       AvailabilityZones:
@@ -89,6 +90,8 @@ Metadata:
         default: Catalina options
       CidrBlock:
         default: Permitted IP range
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       ClusterNodeMax:
         default: Maximum number of cluster nodes
       ClusterNodeMin:
@@ -147,8 +150,8 @@ Metadata:
         default: Custom command-line parameters for Ansible
       DeploymentAutomationKeyName:
         default: SSH keyname to use with the repository
-      CloudWatchIntegration:
-        default: Enable CloudWatch integration
+      ExportPrefix:
+        default: ASI identifier
       HostedZone:
         default: Route 53 Hosted Zone
       InternetFacingLoadBalancer:
@@ -488,6 +491,11 @@ Parameters:
     Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
     AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
     ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
+  ExportPrefix:
+    Default: 'ATL-'
+    Description:
+      Identifier used in all variables exported from this deployment’s Atlassian Standard Infrastructure (VPCID, SubnetIDs, KeyName). Use different identifier to deploy multiple Atlassian Standard Infrastructures in the same AWS region.
+    Type: String
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Amazon Route 53 Hosted Zone.
@@ -719,6 +727,7 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref 'AvailabilityZones'
+        ExportPrefix: !Ref 'ExportPrefix'
         KeyPairName: !Ref 'KeyPairName'
 
   ConfluenceStack:
@@ -736,9 +745,9 @@ Resources:
 
         # NOTE: This is set to default due to CF parameter limits.
         AutologinCookieAge: ''
-
         CatalinaOpts: !Ref 'CatalinaOpts'
         CidrBlock: !Ref 'CidrBlock'
+        CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
         ClusterNodeMax: !Ref 'ClusterNodeMax'
         ClusterNodeMin: !Ref 'ClusterNodeMin'
@@ -768,7 +777,7 @@ Resources:
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
-        CloudWatchIntegration: !Ref 'CloudWatchIntegration'
+        ExportPrefix: !Ref 'ExportPrefix'
         HostedZone: !Ref 'HostedZone'
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmHeapOverrideSynchrony: !Ref 'JvmHeapOverrideSynchrony'
