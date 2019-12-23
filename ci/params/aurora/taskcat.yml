@@ -1,24 +1,13 @@
+---
 global:
   marketplace-ami: false
-  owner: quickstart-eng@amazon.com
+  owner: dc-deployments-syd@atlassian.com
   qsname: quickstart-atlassian-confluence
   regions:
-    - ap-northeast-1
-    - ap-northeast-2
-    - ap-south-1
-    - ap-southeast-1
-    - ap-southeast-2
-    - eu-central-1
-    - eu-west-1
-    - sa-east-1
     - us-east-1
-    - us-west-1
-    - us-west-2
   reporting: true
 
 tests:
   confluence:
-    parameter_input: params/aurora/quickstart-confluence-default.json
+    parameter_input: params/aurora/quickstart-confluence-dc-aurora-params.json
     template_file: quickstart-confluence-master.template.yaml
-    regions:
-     - us-east-1
