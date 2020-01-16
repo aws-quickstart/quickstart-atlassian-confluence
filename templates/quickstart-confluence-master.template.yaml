@@ -338,7 +338,7 @@ Parameters:
     Description: Collaborative Editing can be off, run locally on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
   ConfluenceVersion:
-    Default: '6.13.5'
+    Default: '6.13.10'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
     ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install.
@@ -1071,13 +1071,17 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Action:
-                - 'ec2:DescribeInstances'
-                - 'route53:ListHostedZones'
-                - 'route53:ListResourceRecordSet'
+                  - 'autoscaling:DescribeTags'
+                  - 'autoscaling:CreateOrUpdateTags'
+                  - 'ec2:CreateTags'
+                  - 'ec2:DescribeInstances'
+                  - 'ec2:DescribeTags'
+                  - 'route53:ListHostedZones'
+                  - 'route53:ListResourceRecordSet'
                 Effect: Allow
                 Resource: ['*']
               - Action:
-                - "route53:ChangeResourceRecordSets"
+                  - "route53:ChangeResourceRecordSets"
                 Effect: Allow
                 Resource:
                   - !Sub "arn:${AWS::Partition}:route53:::healthcheck/*"
@@ -1107,7 +1111,8 @@ Resources:
     Properties:
       Path: /
       Roles: [!Ref ConfluenceClusterNodeRole]
-# Confluence node config
+
+  # Confluence node config
   ClusterNodeGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -1126,6 +1131,14 @@ Resources:
         - Key: Cluster
           Value: !Ref AWS::StackName
           PropagateAtLaunch: true
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+          PropagateAtLaunch: true
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
+          PropagateAtLaunch: true
+
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     DependsOn:
@@ -1526,7 +1539,7 @@ Resources:
         - Name: AutoScalingGroupName
           Value: !Ref SynchronyClusterNodeGroup
       ComparisonOperator: LessThanThreshold
-# Elastic file system
+  # Elastic file system
   ElasticFileSystem:
     Type: AWS::EFS::FileSystem
     Properties:
@@ -1535,6 +1548,11 @@ Resources:
           Value: !Join [' ', [!Ref 'AWS::StackName', 'cluster shared-files']]
         - Key: Application
           Value: !Ref AWS::StackId
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1616,6 +1634,11 @@ Resources:
           Value: !Sub ["${StackName}-LoadBalancer", StackName: !Ref 'AWS::StackName']
         - Key: Cluster
           Value: !Ref AWS::StackName
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1699,6 +1722,11 @@ Resources:
           Value: MainTargetGroup
         - Key: Cluster
           Value: !Ref AWS::StackName
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1793,6 +1821,11 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
       VpcId:
         Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
