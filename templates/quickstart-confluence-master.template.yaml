@@ -1850,7 +1850,6 @@ Resources:
         ProductStackName: !Sub "${AWS::StackName}"
         ProductFamilyName: "confluence"
         AsgToMonitor: !Ref ClusterNodeGroup
-        DatabaseIdentifier: !Sub ["${DBStackNamePrefix}-db", {DBStackNamePrefix: !Ref 'AWS::StackName'}]
 
 Outputs:
   ServiceURL:
