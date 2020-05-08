@@ -39,6 +39,10 @@ Metadata:
           - DBStorageEncrypted
           - DBStorageType
       - Label:
+          default: Bastion host provisioning
+        Parameters:
+          - BastionHostRequired
+      - Label:
           default: Networking
         Parameters:
           - AvailabilityZones
@@ -160,6 +164,8 @@ Metadata:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
+      BastionHostRequired:
+        default: Deploy Bastion host
       KeyPairName:
         default: SSH Key Pair Name
       MailEnabled:
@@ -518,10 +524,17 @@ Parameters:
     Default: ''
     Description: The heap size to use, in MiB (e.g., 1024m) or GiB (e.g., 1g), to override the default amount of memory to allocate to the JVM for Synchrony.
     Type: String
+  BastionHostRequired:
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won't be able to use the Bastion host to access Crowd instances).
+    Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances.
-    Type: AWS::EC2::KeyPair::KeyName
+    Type: String
     Default: ''
   MailEnabled:
     AllowedValues:
@@ -717,6 +730,11 @@ Conditions:
   GovCloudCondition: !Equals
     - !Ref 'AWS::Region'
     - us-gov-west-1
+  KeyProvided:
+    !Not [!Equals [!Ref KeyPairName, '']]
+  ProvisionBastion: !And
+    - !Equals [!Ref BastionHostRequired, true]
+    - !Condition KeyProvided
 
 Resources:
   VPCStack:
@@ -735,6 +753,8 @@ Resources:
           - !Ref 'AvailabilityZones'
         ExportPrefix: !Ref 'ExportPrefix'
         KeyPairName: !Ref 'KeyPairName'
+        BastionHostRequired: !Ref 'BastionHostRequired'
+
 
   ConfluenceStack:
     DependsOn: VPCStack
@@ -805,6 +825,7 @@ Resources:
         TomcatRedirectPort: !Ref 'TomcatRedirectPort'
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        BastionHostRequired: !Ref 'BastionHostRequired'
 
 Outputs:
   ServiceURL:
@@ -814,6 +835,7 @@ Outputs:
     Description: The Load Balancer URL.
     Value: !GetAtt 'ConfluenceStack.Outputs.LoadBalancerURL'
   BastionIP:
+    Condition: ProvisionBastion
     Description: Bastion node IP (use as a jumpbox to connect to the nodes).
     Value: !GetAtt 'VPCStack.Outputs.BastionPubIp'
   SGname:
