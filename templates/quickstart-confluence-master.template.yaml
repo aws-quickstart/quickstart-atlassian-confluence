@@ -535,7 +535,7 @@ Parameters:
     AllowedValues:
       - "true"
       - "false"
-    Description: Whether to grant access to Confluence's EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.
+    Description: Whether to grant access to Confluence EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
