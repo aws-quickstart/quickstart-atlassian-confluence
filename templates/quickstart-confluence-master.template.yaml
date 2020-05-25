@@ -38,11 +38,15 @@ Metadata:
           - DBStorageEncrypted
           - DBStorageType
       - Label:
+          default: Bastion host utilization
+        Parameters:
+          - BastionHostRequired
+          - KeyPairName
+      - Label:
           default: Networking
         Parameters:
           - CidrBlock
           - InternetFacingLoadBalancer
-          - KeyPairName
           - SSLCertificateARN
       - Label:
           default: DNS
@@ -162,6 +166,8 @@ Metadata:
         default: Confluence Heap Size Override
       JvmHeapOverrideSynchrony:
         default: Synchrony Heap Size Override
+      BastionHostRequired:
+        default: Use Bastion host
       KeyPairName:
         default: SSH Key Pair Name
       MailEnabled:
@@ -524,10 +530,17 @@ Parameters:
     Default: ''
     Description: The heap size to use, in MiB (e.g., 1024m) or GiB (e.g., 1g), to override the default amount of memory to allocate to the JVM for Synchrony.
     Type: String
+  BastionHostRequired:
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to grant access to Confluence EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.
+    Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances.
-    Type: AWS::EC2::KeyPair::KeyName
+    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+    Type: String
     Default: ''
   MailEnabled:
     AllowedValues:
@@ -744,6 +757,9 @@ Conditions:
     !Equals [!Ref DBEngine, "Amazon Aurora PostgreSQL"]
   DBEnginePostgres:
     !Equals [!Ref DBEngine, "PostgreSQL"]
+  UseBastionHost: !And
+    - !Equals [!Ref BastionHostRequired, true]
+    - !Condition KeyProvided
 Mappings:
   AWSInstanceType2Arch:
     c4.large:
@@ -1298,7 +1314,7 @@ Resources:
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
-        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
+        - Ref: AWS::NoValue
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -1831,14 +1847,17 @@ Resources:
           FromPort: 8091
           ToPort: 8091
           CidrIp: !Ref CidrBlock
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp:
-            !Sub
+        - !If
+          - UseBastionHost
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp:
+              !Sub
               - "${BastionIp}/32"
               - BastionIp:
                   Fn::ImportValue: !Sub '${ExportPrefix}BastionPrivIp'
+          - Ref: AWS::NoValue
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
