@@ -1135,8 +1135,7 @@ Resources:
                   - 'ssm:PutParameter'
                 Effect: Allow
                 Resource: !Sub
-                  - arn:${ArnPartition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
-                  - ArnPartition: !If ["GovCloudCondition", "aws-us-gov", "aws"]
+                  - arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
   ConfluenceClusterNodeInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
