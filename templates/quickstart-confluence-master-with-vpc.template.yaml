@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: Atlassian Confluence Data Center with VPC
+Description: 'Atlassian Confluence Data Center with VPC. (qs-1qup6ra27)'
 
 Metadata:
   AWS::CloudFormation::Interface:
