@@ -55,7 +55,6 @@ Metadata:
         Parameters:
           - CustomDnsName
           - HostedZone
-          - SubDomainName
       - Label:
           default: Application tuning
         Parameters:
@@ -172,8 +171,6 @@ Metadata:
         default: Enable App to Process Email
       SSLCertificateARN:
         default: SSL Certificate ARN
-      SubDomainName:
-        default: Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -544,10 +541,6 @@ Parameters:
     Default: "true"
     Description: Enable mail processing and sending.
     Type: String
-  SubDomainName:
-    Description: (Optional) Leave this field blank to use your stack name as the sub-domain.
-    Default: ''
-    Type: String
   SSLCertificateARN:
     Default: ''
     Description: "Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created."
@@ -809,7 +802,6 @@ Resources:
         JvmHeapOverrideSynchrony: !Ref 'JvmHeapOverrideSynchrony'
         KeyPairName: !Ref 'KeyPairName'
         MailEnabled: !Ref 'MailEnabled'
-        SubDomainName: !Ref 'SubDomainName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
         SynchronyClusterNodeMax: !Ref 'SynchronyClusterNodeMax'
         SynchronyClusterNodeMin: !Ref 'SynchronyClusterNodeMin'

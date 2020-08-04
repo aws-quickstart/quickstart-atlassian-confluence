@@ -53,7 +53,6 @@ Metadata:
         Parameters:
           - CustomDnsName
           - HostedZone
-          - SubDomainName
       - Label:
           default: Advanced (Optional)
         Parameters:
@@ -174,8 +173,6 @@ Metadata:
         default: Enable App to Process Email
       SSLCertificateARN:
         default: SSL Certificate ARN
-      SubDomainName:
-        default: Sub-domain for Hosted Zone
       SynchronyClusterNodeMax:
         default: Maximum number of Synchrony cluster nodes
       SynchronyClusterNodeMin:
@@ -550,10 +547,6 @@ Parameters:
     Default: "true"
     Description: Enable mail processing and sending.
     Type: String
-  SubDomainName:
-    Description: (Optional) Leave this field blank to use your stack name as the sub-domain.
-    Default: ''
-    Type: String
   SSLCertificateARN:
     Default: ''
     Description: "Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created."
@@ -747,8 +740,6 @@ Conditions:
     !Not [!Equals [!Ref HostedZone, '']]
   UsePublicIp:
     !Equals [!Ref InternetFacingLoadBalancer, 'true']
-  UseSubDomainName:
-    !Not [!Equals [!Ref SubDomainName, '']]
   UseSynchronyAutoScalingGroup:
     !Equals [!Ref CollaborativeEditingMode, 'synchrony-separate-nodes']
   GovCloudCondition:
@@ -1162,10 +1153,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 13b52bb58b806b734c70454c91c3f03641f6251f"
+          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-03-09T00:30:43Z"
+          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
           PropagateAtLaunch: true
 
   ClusterNodeLaunchConfig:
@@ -1611,9 +1602,9 @@ Resources:
           Value: !Ref AWS::StackId
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 13b52bb58b806b734c70454c91c3f03641f6251f"
+          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-03-09T00:30:43Z"
+          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1697,9 +1688,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 13b52bb58b806b734c70454c91c3f03641f6251f"
+          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-03-09T00:30:43Z"
+          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1750,10 +1741,7 @@ Resources:
     Properties:
       HostedZoneName: !Ref HostedZone
       Comment: Route53 cname for the ALB
-      Name: !Sub
-        - "${SubDomainName}.${HostedZone}"
-        - SubDomainName: !If [UseSubDomainName, !Ref 'SubDomainName', !Ref 'AWS::StackName']
-          HostedZone: !Ref 'HostedZone'
+      Name: !Join ['.', [!Ref "AWS::StackName", !Ref 'HostedZone']]
       Type: CNAME
       TTL: '900'
       ResourceRecords:
@@ -1785,9 +1773,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 13b52bb58b806b734c70454c91c3f03641f6251f"
+          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-03-09T00:30:43Z"
+          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1895,9 +1883,9 @@ Resources:
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 13b52bb58b806b734c70454c91c3f03641f6251f"
+          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-03-09T00:30:43Z"
+          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
       VpcId:
         Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
