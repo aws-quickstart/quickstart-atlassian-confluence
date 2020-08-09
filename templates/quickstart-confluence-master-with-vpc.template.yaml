@@ -30,6 +30,7 @@ Metadata:
           default: Database
         Parameters:
           - DBEngine
+          - DBEngineVersion
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -113,6 +114,8 @@ Metadata:
           default: DB Acquire Increment
       DBEngine:
         default: Database engine
+      DBEngineVersion:
+        default: The database engine version to use
       DBIdleTestPeriod:
         default: DB Idle Test Period
       DBInstanceClass:
@@ -345,6 +348,13 @@ Parameters:
       - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
+    Type: String
+  DBEngineVersion:
+    Default: 10
+    AllowedValues:
+      - 9
+      - 10
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -775,6 +785,7 @@ Resources:
         ConfluenceVersion: !Ref 'ConfluenceVersion'
         CustomDnsName: !Ref 'CustomDnsName'
         DBEngine: !Ref DBEngine
+        DBEngineVersion: !Ref DBEngineVersion
         DBInstanceClass: !Ref 'DBInstanceClass'
         DBIops: !Ref 'DBIops'
         DBMasterUserPassword: !Ref 'DBMasterUserPassword'
