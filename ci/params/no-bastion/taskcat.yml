@@ -1,0 +1,14 @@
+global:
+  marketplace-ami: false
+  owner: quickstart-eng@amazon.com
+  qsname: quickstart-atlassian-confluence
+  regions:
+    - ap-northeast-2
+  reporting: true
+
+tests:
+  confluence:
+    parameter_input: params/no-bastion/quickstart-confluence-no-bastion.json
+    template_file: quickstart-confluence-master-with-vpc.template.yaml
+    regions:
+     - ap-northeast-2

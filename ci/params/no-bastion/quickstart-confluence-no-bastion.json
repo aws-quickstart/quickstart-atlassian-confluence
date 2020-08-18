@@ -1,0 +1,54 @@
+[
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "$[taskcat_genaz_2]"
+  },
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "DBMultiAZ",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "DBStorage",
+    "ParameterValue": "100"
+  },
+  {
+    "ParameterKey": "DBStorageType",
+    "ParameterValue": "Provisioned IOPS"
+  },
+  {
+    "ParameterKey": "CustomDnsName",
+    "ParameterValue": "qs-conf-ci.awsqs.com"
+  },
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "quickstart-atlassian-confluence/"
+  },
+  {
+    "ParameterKey": "CollaborativeEditingMode",
+    "ParameterValue": "synchrony-separate-nodes"
+  },
+  {
+    "ParameterKey": "ExportPrefix",
+    "ParameterValue": "$[taskcat_random-string]"
+  },
+  {
+    "ParameterKey": "BastionHostRequired",
+    "ParameterValue": "false"
+  }
+]
