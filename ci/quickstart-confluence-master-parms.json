@@ -46,5 +46,9 @@
   {
     "ParameterKey": "ExportPrefix",
     "ParameterValue": "$[taskcat_random-string]"
+  },
+  {
+    "ParameterKey": "CollaborativeEditingMode",
+    "ParameterValue": "synchrony-separate-nodes"
   }
 ]
