@@ -40,15 +40,15 @@
     "ParameterValue": "quickstart-atlassian-confluence/"
   },
   {
-    "ParameterKey": "KeyPairName",
-    "ParameterValue": "replaced-by-taskcat-override-file"
+    "ParameterKey": "CollaborativeEditingMode",
+    "ParameterValue": "synchrony-separate-nodes"
   },
   {
     "ParameterKey": "ExportPrefix",
     "ParameterValue": "$[taskcat_random-string]"
   },
   {
-    "ParameterKey": "CollaborativeEditingMode",
-    "ParameterValue": "synchrony-separate-nodes"
+    "ParameterKey": "BastionHostRequired",
+    "ParameterValue": "false"
   }
 ]
