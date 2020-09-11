@@ -29,6 +29,7 @@ Metadata:
           default: Database
         Parameters:
           - DBEngine
+          - DBEngineVersion
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -117,6 +118,8 @@ Metadata:
         default: DB Idle Test Period
       DBEngine:
         default: Database engine
+      DBEngineVersion:
+        default: The database engine version to use
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -341,7 +344,7 @@ Parameters:
     Description: Collaborative Editing can be off, run locally on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.
     Type: String
   ConfluenceVersion:
-    Default: '6.13.10'
+    Default: '7.4.3'
     AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
     ConstraintDescription: "Must be a valid Confluence version number, for example 6.13.2. Find valid versions at https://confluence.atlassian.com/display/DOC/Confluence+Release+Notes"
     Description: The version of Confluence to install
@@ -357,6 +360,13 @@ Parameters:
       - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
+    Type: String
+  DBEngineVersion:
+    Default: 10
+    AllowedValues:
+      - 9
+      - 10
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -1074,7 +1084,7 @@ Resources:
               Service: [ec2.amazonaws.com]
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
-        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
       Path: /
       Policies:
@@ -1153,10 +1163,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
+          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
+          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
           PropagateAtLaunch: true
 
   ClusterNodeLaunchConfig:
@@ -1520,7 +1530,7 @@ Resources:
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
-        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
+        - Ref: AWS::NoValue
       IamInstanceProfile: !Ref ConfluenceClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -1602,9 +1612,9 @@ Resources:
           Value: !Ref AWS::StackId
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
+          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
+          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1645,14 +1655,15 @@ Resources:
         - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
       Parameters:
         DatabaseImplementation: !Ref DBEngine
-        DBSecurityGroup: !Ref SecurityGroup
+        DBAllocatedStorage: !Ref DBStorage
         DBAutoMinorVersionUpgrade: "true"
         DBBackupRetentionPeriod: "1"
+        DBEngineVersion: !Ref DBEngineVersion
         DBInstanceClass: !Ref DBInstanceClass
         DBIops: !Ref DBIops
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
-        DBAllocatedStorage: !Ref DBStorage
+        DBSecurityGroup: !Ref SecurityGroup
         DBStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !Ref DBStorageType
         ExportPrefix: !Ref ExportPrefix
@@ -1688,9 +1699,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
+          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
+          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1773,9 +1784,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
+          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
+          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1883,9 +1894,9 @@ Resources:
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 2372e403924d36a3ab458ed5da98ef7800ad1a00"
+          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:32:36Z"
+          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
       VpcId:
         Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
