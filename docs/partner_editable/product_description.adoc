@@ -1,0 +1,7 @@
+// Replace the content in <>
+// Briefly describe the software. Use consistent and clear branding.
+// Include the benefits of using the software on AWS, and provide details on usage scenarios.
+
+Confluence is Atlassian's team collaboration software that changes how modern teams work. Confluence Data Center is a self-managed solution that gives you high availability, performance at scale, and disaster recovery for uninterrupted access to Confluence for all your teams.
+
+Please know that we may share who uses AWS Quick Starts with the AWS partner that collaborated with AWS on the content of the Quick Start.
