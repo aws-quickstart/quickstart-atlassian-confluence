@@ -12,8 +12,8 @@ quickstart-atlassian-confluence
 │   └── templates
 │       └── quickstart-vpc-for-atlassian-services.yaml
 └── templates
-    ├── quickstart-confluence-dc-with-vpc.template.yaml
-    └── quickstart-confluence-dc.template.yaml
+    ├── quickstart-confluence-master-with-vpc.template.yaml
+    └── quickstart-confluence.template.yaml
 ----
 . Install and set up the https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html[AWS Command Line Interface (CLI)] so that you can create an S3 bucket and upload content to it.
 . Create an S3 bucket in your Region:
