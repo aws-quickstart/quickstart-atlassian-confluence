@@ -50,5 +50,9 @@
   {
     "ParameterKey": "CollaborativeEditingMode",
     "ParameterValue": "synchrony-separate-nodes"
+  },
+  {
+    "ParameterKey": "BastionHostRequired",
+    "ParameterValue": "false"
   }
 ]
