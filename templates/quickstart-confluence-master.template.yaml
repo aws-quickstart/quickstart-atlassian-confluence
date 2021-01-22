@@ -2,6 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Atlassian Confluence Data Center. (qs-1qup6ra2n)'
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
