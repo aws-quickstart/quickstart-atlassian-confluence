@@ -27,6 +27,8 @@ Metadata:
           - DeploymentAutomationPlaybook
           - DeploymentAutomationCustomParams
           - DeploymentAutomationKeyName
+          - EFSStorageEncrypted
+          - KeyPairName
       - Label:
           default: Database
         Parameters:
@@ -44,12 +46,17 @@ Metadata:
           default: Bastion host utilization
         Parameters:
           - BastionHostRequired
-          - KeyPairName
+          - BastionPrivIp
       - Label:
           default: Networking
         Parameters:
-          - CidrBlock
           - InternetFacingLoadBalancer
+          - VpcID
+          - CidrBlock
+          - PubNets
+          - PriNets
+          - Nat1Eip
+          - Nat2Eip
           - SSLCertificateARN
       - Label:
           default: DNS
@@ -160,6 +167,8 @@ Metadata:
         default: Custom command-line parameters for Ansible
       DeploymentAutomationKeyName:
         default: SSH keyname to use with the repository
+      EFSStorageEncrypted:
+        default: EFS file system encryption
       ExportPrefix:
         default: ASI identifier
       HostedZone:
@@ -172,10 +181,20 @@ Metadata:
         default: Synchrony Heap Size Override
       BastionHostRequired:
         default: Use Bastion host
+      BastionPrivIp:
+        default: IP of Bastion Host
       KeyPairName:
         default: SSH Key Pair Name
       MailEnabled:
         default: Enable App to Process Email
+      Nat1Eip:
+        default: Elastic IP of Private Subnet 1
+      Nat2Eip:
+        default: Elastic IP of Private Subnet 2
+      PubNets:
+        default: Public Subnet IDs
+      PriNets:
+        default: Private Subnet IDs
       SSLCertificateARN:
         default: SSL Certificate ARN
       SynchronyClusterNodeMax:
@@ -202,6 +221,8 @@ Metadata:
         default: Tomcat Protocol
       TomcatRedirectPort:
         default: Tomcat Redirect Port
+      VpcID:
+        default: ID of VPC for deployment
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
@@ -368,7 +389,7 @@ Parameters:
     AllowedValues:
       - 9
       - 10
-    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected. Check https://confluence.atlassian.com/doc/supported-platforms-207488198.html to verify this."
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -520,6 +541,13 @@ Parameters:
     Description:
       Identifier used in all variables exported from this deployment’s Atlassian Standard Infrastructure (VPCID, SubnetIDs, KeyName). Use different identifier to deploy multiple Atlassian Standard Infrastructures in the same AWS region.
     Type: String
+  EFSStorageEncrypted:
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether or not to encrypt the Elastic File System for shared files
+    Type: String
   HostedZone:
     Default: ''
     ConstraintDescription: Must be the name of an existing Amazon Route 53 Hosted Zone.
@@ -546,9 +574,16 @@ Parameters:
       - "false"
     Description: Whether to grant access to Confluence EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.
     Type: String
+  BastionPrivIp:
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})'
+    ConstraintDescription: Must be a valid IP of the form x.x.x.x.
+    Description: IP address of ASI Bastion host (if it exists). If set, remember to set "Bastion Host Required". If your ASI does not have a Bastion host, leave this blank.
+    Type: String
+    MinLength: 7
+    MaxLength: 18
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+    Description: Public/private EC2 Key Pairs to allow you to securely access the Confluence cluster nodes and, if configrued, the Bastion hosts.
     Type: String
     Default: ''
   MailEnabled:
@@ -558,6 +593,32 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Default: "true"
     Description: Enable mail processing and sending.
+    Type: String
+  Nat1Eip:
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})'
+    ConstraintDescription: Must be a valid IP of the form x.x.x.x.
+    Description: IP address of NAT Gateway for subnet 1.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+  Nat2Eip:
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})' 
+    ConstraintDescription: Must be a valid IP of the form x.x.x.x.
+    Description: IP address of NAT Gateway for subnet 2.
+    Type: String 
+    MinLength: 9
+    MaxLength: 18
+  PubNets:
+    Default: ''
+    Description: "Public Subnet IDs, separated by comma"
+    MinLength: 0
+    MaxLength: 90
+    Type: String
+  PriNets:
+    Default: ''                                                                                                      
+    Description: "Private Subnet IDs, separated by comma"
+    MinLength: 0
+    MaxLength: 90
     Type: String
   SSLCertificateARN:
     Default: ''
@@ -709,6 +770,10 @@ Parameters:
     Default: 8443
     Description: The port number for Catalina to use when automatically redirecting a non-SSL connector actioning a redirect to a SSL URI.
     Type: Number
+  VpcID:
+    Default: 'vpc-'
+    Description: ID of the VPC to deploy Confluence into.
+    Type: String
   QSS3BucketName:
     Default: 'aws-quickstart'
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -734,6 +799,8 @@ Conditions:
     !Not [!Equals [!Ref MailEnabled, true]]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
+  BastionIpProvided:
+    !Not [!Equals [!Ref BastionPrivIp, '']]
   EnableCloudWatch:
     !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
   EnableCloudWatchLogs:
@@ -744,14 +811,24 @@ Conditions:
     !Not [!Equals [!Ref JvmHeapOverride, '']]
   OverrideHeapSynchrony:
     !Not [!Equals [!Ref JvmHeapOverrideSynchrony, '']]
+  PubNetsProvided:
+    !Not [!Equals [!Ref PubNets, '']]
   UseContextPath:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
     !Not [!Equals [!Ref CustomDnsName, '']]
+  UseDatabaseEncryption:
+    !Equals [!Ref DBStorageEncrypted, true]
+  UseEFSEncryption:
+    !Equals [!Ref EFSStorageEncrypted, true]
+  UseEncryption: !Or
+    - !Equals [UseDatabaseEncryption, true]
+    - !Equals [UseEFSEncryption, true]
   UseHostedZone:
     !Not [!Equals [!Ref HostedZone, '']]
-  UsePublicIp:
-    !Equals [!Ref InternetFacingLoadBalancer, 'true']
+  UsePublicIp: !And
+    - !Equals [!Ref InternetFacingLoadBalancer, 'true']
+    - !Condition PubNetsProvided
   UseSynchronyAutoScalingGroup:
     !Equals [!Ref CollaborativeEditingMode, 'synchrony-separate-nodes']
   GovCloudCondition:
@@ -763,6 +840,7 @@ Conditions:
   UseBastionHost: !And
     - !Equals [!Ref BastionHostRequired, true]
     - !Condition KeyProvided
+    - !Condition BastionIpProvided
 Mappings:
   AWSInstanceType2Arch:
     c4.large:
@@ -1155,7 +1233,7 @@ Resources:
       TargetGroupARNs: [!Ref MainTargetGroup]
       VPCZoneIdentifier: !Split
         - ","
-        - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+        - !Ref PriNets
       Tags:
         - Key: Name
           Value: !Sub ["${StackName} Confluence Node", StackName: !Ref 'AWS::StackName']
@@ -1165,10 +1243,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 98565fe4eed65fbe8db1b45f8d1eaa3b60317340"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T14:40:33Z"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
           PropagateAtLaunch: true
 
   ClusterNodeLaunchConfig:
@@ -1614,9 +1692,10 @@ Resources:
           Value: !Ref AWS::StackId
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 98565fe4eed65fbe8db1b45f8d1eaa3b60317340"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T14:40:33Z"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+      Encrypted: !If [UseEFSEncryption, !Ref EFSStorageEncrypted, !Ref 'AWS::NoValue']
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1626,7 +1705,7 @@ Resources:
         - 0
         - !Split
           - ","
-          - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+          - !Ref PriNets
   EFSMountAz2:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1636,7 +1715,7 @@ Resources:
         - 1
         - !Split
           - ","
-          - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+          - !Ref PriNets
   EFSCname:
     Type: AWS::Route53::RecordSet
     Condition: UseHostedZone
@@ -1668,6 +1747,8 @@ Resources:
         DBSecurityGroup: !Ref SecurityGroup
         DBStorageEncrypted: !Ref DBStorageEncrypted
         DBStorageType: !Ref DBStorageType
+        PriNets: !Ref PriNets
+        VpcID: !Ref VpcID
         ExportPrefix: !Ref ExportPrefix
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
@@ -1691,9 +1772,10 @@ Resources:
           Value: '300'
       Scheme: !If [UsePublicIp, 'internet-facing', 'internal']
       SecurityGroups: [!Ref SecurityGroup]
-      Subnets: !Split
-        - ","
-        - Fn::ImportValue: !Sub "${ExportPrefix}PubNets"
+      Subnets: !If
+        - UsePublicIp
+        - Fn::Split: [',', !Ref PubNets]
+        - Fn::Split: [",", !Ref PriNets]
       Tags:
         - Key: Name
           Value: !Sub ["${StackName}-LoadBalancer", StackName: !Ref 'AWS::StackName']
@@ -1701,9 +1783,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 98565fe4eed65fbe8db1b45f8d1eaa3b60317340"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T14:40:33Z"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1764,8 +1846,7 @@ Resources:
     Properties:
       Port: !Ref TomcatDefaultConnectorPort
       Protocol: HTTP
-      VpcId:
-        Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
+      VpcId: !Ref VpcID
       HealthCheckIntervalSeconds: 20
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 2
@@ -1786,9 +1867,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 98565fe4eed65fbe8db1b45f8d1eaa3b60317340"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T14:40:33Z"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1797,8 +1878,7 @@ Resources:
     Properties:
       Port: 8091
       Protocol: HTTP
-      VpcId:
-        Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
+      VpcId: !Ref VpcID
       HealthCheckIntervalSeconds: 20
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 2
@@ -1857,7 +1937,7 @@ Resources:
               !Sub
               - "${BastionIp}/32"
               - BastionIp:
-                  Fn::ImportValue: !Sub '${ExportPrefix}BastionPrivIp'
+                  !Ref BastionPrivIp
           - Ref: AWS::NoValue
         - IpProtocol: tcp
           FromPort: 80
@@ -1866,7 +1946,7 @@ Resources:
             !Sub
             - "${NAT1IP}/32"
             - NAT1IP:
-                Fn::ImportValue: !Sub '${ExportPrefix}NAT1EIP'
+                !Ref Nat1Eip
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -1874,7 +1954,7 @@ Resources:
             !Sub
             - "${NAT2IP}/32"
             - NAT2IP:
-                Fn::ImportValue: !Sub '${ExportPrefix}NAT2EIP'
+                !Ref Nat2Eip
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -1882,7 +1962,7 @@ Resources:
             !Sub
             - "${NAT1IP}/32"
             - NAT1IP:
-                Fn::ImportValue: !Sub '${ExportPrefix}NAT1EIP'
+                !Ref Nat1Eip
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -1890,15 +1970,15 @@ Resources:
             !Sub
             - "${NAT2IP}/32"
             - NAT2IP:
-                Fn::ImportValue: !Sub '${ExportPrefix}NAT2EIP'
+                !Ref Nat2Eip
       Tags:
         - Key: Name
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 98565fe4eed65fbe8db1b45f8d1eaa3b60317340"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T14:40:33Z"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
       VpcId:
         Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
@@ -1917,7 +1997,36 @@ Resources:
       Type: String
       AllowedPattern: '^(latest)|([0-9a-f]{5,40})$'
       Value: "latest"
-
+  EncryptionKey:
+    Condition: UseEncryption
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Sub "${AWS::StackName}"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action: 'kms:*'
+            Resource: '*'
+      Tags:
+        - Key: Name
+          Value: !Sub ["${StackName} Encryption Key", {StackName: !Ref 'AWS::StackName'}]
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+  EncryptionKeyAlias:
+    Condition: UseEncryption
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${AWS::StackName}"
+      TargetKeyId: !Ref EncryptionKey
 # Optional: CloudWatch dashboard to be created when CloudWatch is enabled
   CloudWatchDashboard:
     DependsOn:
@@ -1970,6 +2079,10 @@ Outputs:
   DBEndpointAddress:
     Description: The Database Connection String
     Value: !GetAtt DB.Outputs.RDSEndPointAddress
+  DBEncryptionKey:
+    Condition: UseDatabaseEncryption
+    Description: The alias of the encryption key created for RDS
+    Value: !Sub "alias/${AWS::StackName}"
   EFSCname:
     Description: The cname of the EFS
     Value: !If
