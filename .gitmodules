@@ -2,6 +2,7 @@
 	path = submodules/quickstart-atlassian-services
 	url = https://github.com/tthoma24/quickstart-atlassian-services.git
 	branch = main
+	ignore = dirty
 [submodule "docs/boilerplate"]
 	path = docs/boilerplate
 	url = https://github.com/tthoma24/quickstart-documentation-base-common.git
