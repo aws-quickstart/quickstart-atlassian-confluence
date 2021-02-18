@@ -1243,10 +1243,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
           PropagateAtLaunch: true
 
   ClusterNodeLaunchConfig:
@@ -1474,7 +1474,7 @@ Resources:
       TargetGroupARNs: [!Ref SynchronyTargetGroup]
       VPCZoneIdentifier: !Split
         - ","
-        - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+        - !Ref PriNets"
       Tags:
         - Key: Name
           Value: !Sub ["${StackName} Synchrony Node", StackName: !Ref 'AWS::StackName']
@@ -1692,9 +1692,9 @@ Resources:
           Value: !Ref AWS::StackId
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
       Encrypted: !If [UseEFSEncryption, !Ref EFSStorageEncrypted, !Ref 'AWS::NoValue']
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
@@ -1783,9 +1783,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1867,9 +1867,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1976,11 +1976,11 @@ Resources:
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
       VpcId:
-        Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
+        !Ref VpcID
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -2018,9 +2018,9 @@ Resources:
           Value: !Sub ["${StackName} Encryption Key", {StackName: !Ref 'AWS::StackName'}]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: bd8c3f87fa2a73ee768dba149d3d4476143423c3"
+          Value: "COMMIT: f72361f3f072b7abb19b518b1fd93e5304faab0e"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-18T18:35:28Z"
+          Value: "TIMESTAMP: 2021-02-18T19:03:15Z"
   EncryptionKeyAlias:
     Condition: UseEncryption
     Type: AWS::KMS::Alias
