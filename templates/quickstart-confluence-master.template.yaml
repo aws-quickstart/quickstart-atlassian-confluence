@@ -19,6 +19,7 @@ Metadata:
           - ClusterNodeMax
           - ClusterNodeMin
           - ClusterNodeVolumeSize
+          - ClusterNodeVolumeEncrypted
           - SynchronyClusterNodeMax
           - SynchronyClusterNodeMin
           - SynchronyNodeInstanceType
@@ -115,6 +116,8 @@ Metadata:
         default: Cluster node instance type
       ClusterNodeVolumeSize:
         default: Cluster node instance volume size
+      ClusterNodeVolumeEncrypted:
+        default: Cluster node instance volume encryption
       CollaborativeEditingMode:
         default: Collaborative editing mode
       ConfluenceVersion:
@@ -358,6 +361,13 @@ Parameters:
     Default: 50
     Description: Size of cluster node root volume in GB (note - size based upon Application indexes x 4).
     Type: Number
+  ClusterNodeVolumeEncrypted:
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether or not to encrypt the cluster node root EBS volume.
+    Type: String
   CollaborativeEditingMode:
     Default: synchrony-local
     AllowedValues:
@@ -817,6 +827,8 @@ Conditions:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
     !Not [!Equals [!Ref CustomDnsName, '']]
+  UseEBSEncryption:
+    !Equals [!Ref ClusterNodeVolumeEncrypted, true]
   UseDatabaseEncryption:
     !Equals [!Ref DBStorageEncrypted, true]
   UseEFSEncryption:
@@ -1390,6 +1402,7 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeSize: !Ref ClusterNodeVolumeSize
+            Encrypted: !If [UseEBSEncryption, !Ref ClusterNodeVolumeEncrypted, !Ref 'AWS::NoValue']
         - DeviceName: /dev/xvdf
           NoDevice: true
       KeyName: !If
