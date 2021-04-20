@@ -366,6 +366,7 @@ Parameters:
     AllowedValues:
       - 9
       - 10
+      - 11
     Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:
@@ -1163,10 +1164,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
+          Value: "COMMIT: 1999e3ab2a25e7d09886757adc8e0f3932a00a46"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
+          Value: "TIMESTAMP: 2021-04-20T00:40:23Z"
           PropagateAtLaunch: true
 
   ClusterNodeLaunchConfig:
@@ -1612,9 +1613,9 @@ Resources:
           Value: !Ref AWS::StackId
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
+          Value: "COMMIT: 1999e3ab2a25e7d09886757adc8e0f3932a00a46"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
+          Value: "TIMESTAMP: 2021-04-20T00:40:23Z"
   EFSMountAz1:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -1699,9 +1700,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
+          Value: "COMMIT: 1999e3ab2a25e7d09886757adc8e0f3932a00a46"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
+          Value: "TIMESTAMP: 2021-04-20T00:40:23Z"
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1784,9 +1785,9 @@ Resources:
           Value: !Ref AWS::StackName
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
+          Value: "COMMIT: 1999e3ab2a25e7d09886757adc8e0f3932a00a46"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
+          Value: "TIMESTAMP: 2021-04-20T00:40:23Z"
     DependsOn:
       - LoadBalancer
   SynchronyTargetGroup:
@@ -1894,9 +1895,9 @@ Resources:
           Value: !Join [' ', [!Ref "AWS::StackName", 'sg']]
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: fc08aac3b7c33646e6db6085460fc7cd3506d8e8"
+          Value: "COMMIT: 1999e3ab2a25e7d09886757adc8e0f3932a00a46"
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-09-10T05:02:45Z"
+          Value: "TIMESTAMP: 2021-04-20T00:40:23Z"
       VpcId:
         Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
