@@ -809,7 +809,6 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_deployment_steps">Deployment steps</a>
 <ul class="sectlevel2">
 <li><a href="#_launching_from_a_cloned_quick_start_recommended_for_production">Launching from a cloned Quick Start (recommended for production)</a></li>
-<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
 <li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
 </ul>
 </li>
@@ -1333,12 +1332,6 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 </li>
 <li>
 <p><a href="#launch-into-an-existing-vpc">[launch-into-an-existing-vpc]</a> (if you&#8217;re deploying Confluence into a new ASI)</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
 <div class="paragraph">
 <p>In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </div>
@@ -1354,40 +1347,46 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>=== Launch into an existing VPC
+.Confluence setup</p>
 </div>
-<div class="sect2">
-<h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. Confluence setup</caption>
 <colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1112%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter label (name)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Collaborative editing mode
 (<code>CollaborativeEditingMode</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>synchrony-local</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Collaborative Editing can be off, run locally on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version *
 (<code>ConfluenceVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.4.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.4.8</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The version of Confluence to install</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. Cluster nodes</caption>
+<caption class="title">Table 1. Cluster nodes</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1482,7 +1481,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. Database</caption>
+<caption class="title">Table 2. Database</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1559,7 +1558,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Bastion host utilization</caption>
+<caption class="title">Table 3. Bastion host utilization</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1588,7 +1587,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. Networking</caption>
+<caption class="title">Table 4. Networking</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1623,7 +1622,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. DNS</caption>
+<caption class="title">Table 5. DNS</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1652,7 +1651,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. Advanced (Optional)</caption>
+<caption class="title">Table 6. Advanced (Optional)</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1675,7 +1674,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 8. Application tuning</caption>
+<caption class="title">Table 7. Application tuning</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1818,7 +1817,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. AWS Quick Start configuration</caption>
+<caption class="title">Table 8. AWS Quick Start configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1856,7 +1855,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <div class="sect2">
 <h3 id="_launch_into_a_new_vpc">Launch into a new VPC</h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. Confluence setup</caption>
+<caption class="title">Table 9. Confluence setup</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1879,13 +1878,13 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version *
 (<code>ConfluenceVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.4.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.4.8</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The version of Confluence to install</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 11. Cluster nodes</caption>
+<caption class="title">Table 10. Cluster nodes</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1980,7 +1979,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 12. Database</caption>
+<caption class="title">Table 11. Database</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2057,7 +2056,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 13. Bastion host provisioning</caption>
+<caption class="title">Table 12. Bastion host provisioning</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2086,7 +2085,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 14. Networking</caption>
+<caption class="title">Table 13. Networking</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2127,7 +2126,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 15. DNS</caption>
+<caption class="title">Table 14. DNS</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2156,7 +2155,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 16. Application tuning</caption>
+<caption class="title">Table 15. Application tuning</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2299,7 +2298,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 17. AWS Quick Start configuration</caption>
+<caption class="title">Table 16. AWS Quick Start configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2333,24 +2332,13 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tr>
 </tbody>
 </table>
-<div class="olist arabic">
-<ol class="arabic" start="5">
-<li>
-<p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.</p>
-</li>
-<li>
-<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
-</li>
-<li>
-<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Confluence Data Center deployment is ready.</p>
-</li>
-<li>
-<p>Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in <a href="#cfn_outputs">Figure 3</a>, to view the created resources.</p>
-</li>
-</ol>
+<div class="paragraph">
+<p>+
+. On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.
+. On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.
+. Choose <strong>Create stack</strong> to deploy the stack.
+. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Confluence Data Center deployment is ready.
+. Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in <a href="#cfn_outputs">Figure 3</a>, to view the created resources.</p>
 </div>
 <div id="cfn_outputs" class="imageblock">
 <div class="content">
@@ -2642,9 +2630,9 @@ and to share your customizations with others.</p>
 </html>
 <!--
 repo commit:
-669fc88f795db86e680fa0074e0d05c7b3997be1
+cd1654ad37fd8769e6030f90c60f7a3cd0ab27a1
 
 submodule config:
- 6786026357fa87960ee8fb7f6e4654f26b0ea232 docs/boilerplate (heads/main)
++59b9927c61cd1831141cf0350520c89abb2246da docs/boilerplate (heads/main)
  ef50cb50e7862fc1fd2cd5f73021a4e3f370fba9 submodules/quickstart-atlassian-services (v2.0-37-gef50cb5)
 -->

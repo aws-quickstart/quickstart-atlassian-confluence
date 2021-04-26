@@ -4,7 +4,7 @@
 |===
 |Parameter label (name) |Default value|Description|Collaborative editing mode
 (`CollaborativeEditingMode`)|`synchrony-local`|Collaborative Editing can be off, run locally on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.|Version *
-(`ConfluenceVersion`)|`7.4.3`|The version of Confluence to install
+(`ConfluenceVersion`)|`7.4.8`|The version of Confluence to install
 |===
 .Cluster nodes
 [width="100%",cols="16%,11%,73%",options="header",]
