@@ -1094,41 +1094,48 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Action:
-                  - 'autoscaling:DescribeTags'
-                  - 'autoscaling:CreateOrUpdateTags'
-                  - 'ec2:CreateTags'
-                  - 'ec2:DescribeInstances'
-                  - 'ec2:DescribeTags'
-                  - 'route53:ListHostedZones'
-                  - 'route53:ListResourceRecordSet'
-                Effect: Allow
-                Resource: ['*']
-              - Action:
-                  - "route53:ChangeResourceRecordSets"
+                  - ec2:CreateTags
+                  - s3:ListBucket
                 Effect: Allow
                 Resource:
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:instance/*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:vpc/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence"
+              - Action:
+                  - autoscaling:CreateOrUpdateTags
+                  - route53:ListResourceRecordSets
+                  - s3:ListBucket
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:route53:::hostedzone/*"
+                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
+                  - !Sub "arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence"
+              - Action:
+                  - ec2:DescribeInstances
+                  - ec2:DescribeTags
+                  - autoscaling:DescribeTags
+                  - route53:ListHostedZones
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - route53:ChangeResourceRecordSets
+                  - s3:ListBucket
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:route53:::hostedzone/*"
                   - !Sub "arn:${AWS::Partition}:route53:::healthcheck/*"
                   - !Sub "arn:${AWS::Partition}:route53:::change/*"
-                  - !Sub "arn:${AWS::Partition}:route53:::hostedzone/*"
                   - !Sub "arn:${AWS::Partition}:route53:::delegationset/*"
-              - Action: ['s3:ListBucket']
+                  - !Sub "arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence"
+              - Action: s3:Get*
                 Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence']
-              - Action: ['s3:Get*']
+                Resource: !Sub "arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence/*"
+              - Action: s3:Get*
                 Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/aws-deployment-test/releases/confluence/*']
-              - Action: ['s3:ListBucket']
+                Resource: !Sub "arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence/*"
+              - Action: s3:Get*
                 Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence']
-              - Action: ['s3:Get*']
-                Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/releases/confluence/*']
-              - Action: ['s3:ListBucket']
-                Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence']
-              - Action: ['s3:Get*']
-                Effect: Allow
-                Resource: [!Sub 'arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence/*']
+                Resource: !Sub "arn:${AWS::Partition}:s3:::/atlassian-software/snapshots/confluence/*"
         - PolicyName: SSMParameterPutAccess
           PolicyDocument:
             Version: 2012-10-17
