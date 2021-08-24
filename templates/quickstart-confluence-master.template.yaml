@@ -1653,7 +1653,7 @@ Resources:
       Comment: Route53 cname for the efs
       Name: !If [ UseHostedZone, !Join ['.', [!Ref 'AWS::StackName', 'efs', !Ref 'HostedZone']], '']
       Type: CNAME
-      TTL: '900'
+      TTL: 900
       ResourceRecords:
         - !Join ['.', [!Ref ElasticFileSystem, 'efs', !Ref 'AWS::Region', 'amazonaws.com.']]
 # Database
@@ -1687,7 +1687,7 @@ Resources:
       Comment: Route53 cname for the RDS
       Name: !Join ['.', [!Ref 'AWS::StackName', 'db', !Ref 'HostedZone']]
       Type: CNAME
-      TTL: '900'
+      TTL: 900
       ResourceRecords:
         - !GetAtt DB.Outputs.RDSEndPointAddress
 # Loadbalancer
@@ -1764,7 +1764,7 @@ Resources:
       Comment: Route53 cname for the ALB
       Name: !Join ['.', [!Ref "AWS::StackName", !Ref 'HostedZone']]
       Type: CNAME
-      TTL: '900'
+      TTL: 900
       ResourceRecords:
         - !GetAtt LoadBalancer.DNSName
   MainTargetGroup:
