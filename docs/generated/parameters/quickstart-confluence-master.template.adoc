@@ -4,7 +4,7 @@
 |===
 |Parameter label (name) |Default value|Description|Collaborative editing mode
 (`CollaborativeEditingMode`)|`synchrony-local`|Collaborative Editing can be off, run locally on the Confluence nodes (requires Confluence version 6.12+ and 1 GB heap free for Synchrony), or run on a separately autoscaled group of nodes.|Version *
-(`ConfluenceVersion`)|`7.4.8`|The version of Confluence to install
+(`ConfluenceVersion`)|`7.13.0`|The version of Confluence to install
 |===
 .Cluster nodes
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -44,7 +44,7 @@
 |===
 |Parameter label (name) |Default value|Description|Use Bastion host
 (`BastionHostRequired`)|`true`|Whether to grant access to Confluence EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.|SSH Key Pair Name
-(`KeyPairName`)|`**__Blank string__**`|Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+(`KeyPairName`)|`**__Blank string__**`|Public/private EC2 Key Pairs (without file extension) to allow you to securely access the Bastion host.
 |===
 .Networking
 [width="100%",cols="16%,11%,73%",options="header",]
