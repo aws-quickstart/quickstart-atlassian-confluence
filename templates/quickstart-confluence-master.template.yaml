@@ -366,7 +366,6 @@ Parameters:
   DBEngineVersion:
     Default: 10
     AllowedValues:
-      - 9
       - 10
       - 11
     Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
