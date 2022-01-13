@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <title>Confluence Data Center on the AWS Cloud</title>
 <style>
 
@@ -1460,7 +1460,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use
 (<code>DBEngineVersion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use; we&#8217;ll install a suitable minor version for your chosen engine. Make sure that the Confluence version you&#8217;re installing supports the database engine selected.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use; we&#8217;ll install a suitable minor version for your chosen engine. Make sure that the Confluence version you&#8217;re installing supports the database engine selected. (Warning: Amazon RDS for PostgreSQL 9.6 will reach end of life on January 31st, 2022. Deployments after this date should not be made using this version. If you wish to upgrade to a major version from 9 see: <a href="https://confluence.atlassian.com/x/1IRlQQ" class="bare">https://confluence.atlassian.com/x/1IRlQQ</a>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Database instance class
@@ -1958,7 +1958,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use
 (<code>DBEngineVersion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use; we&#8217;ll install a suitable minor version for your chosen engine. Make sure that the Confluence version you&#8217;re installing supports the database engine selected.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The database engine version to use; we&#8217;ll install a suitable minor version for your chosen engine. Make sure that the Confluence version you&#8217;re installing supports the database engine selected. (Warning: Amazon RDS for PostgreSQL 9.6 will reach end of life on January 31st, 2022. Deployments after this date should not be made using this version. If you wish to upgrade to a major version from 9 see: <a href="https://confluence.atlassian.com/x/1IRlQQ" class="bare">https://confluence.atlassian.com/x/1IRlQQ</a>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Database instance class
@@ -2580,14 +2580,14 @@ and to share your customizations with others.</p>
 </div>
 <p class="footer-text">
 <!-- We can use document attributes: -->
-<!-- Generated with Asciidoctor v2.0.16. -->
+<!-- Generated with Asciidoctor v2.0.17. -->
 <a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2021, Amazon Web Services, Inc. or its affiliates and Atlassian. All rights reserved.
 </p>
 </body>
 </html>
 <!--
 repo commit:
-af6b9805bf3d5250fe0861de73c3587bfee0eda4
+684def00ad76156d8f6692c9a88c8c00f74bda20
 
 submodule config:
  eea042d0b9c005d2549a71349e5f28b02c81af75 docs/boilerplate (remotes/origin/cdk-13-geea042d)
