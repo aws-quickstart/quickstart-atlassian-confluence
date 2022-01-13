@@ -366,9 +366,10 @@ Parameters:
   DBEngineVersion:
     Default: 10
     AllowedValues:
+      - 9
       - 10
       - 11
-    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected. Warning: Amazon RDS for PostgreSQL 9.6 will reach EOL on January 18, 2022. If this is initial deployment DO NOT choose 9. If you wish to upgrade major version from 9 to upper version see: https://confluence.atlassian.com/confkb/manually-upgrading-the-postgresql-version-of-your-amazon-rds-database-from-9-6-to-10-1097172180.html"
     Type: String
   DBInstanceClass:
     Default: db.m4.large
