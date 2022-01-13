@@ -369,7 +369,7 @@ Parameters:
       - 9
       - 10
       - 11
-    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected."
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Confluence version you're installing supports the database engine selected. (Warning: Amazon RDS for PostgreSQL 9.6 will reach end of life on January 31st, 2022. Deployments after this date should not be made using this version. If you wish to upgrade to a major version from 9 see: https://confluence.atlassian.com/x/1IRlQQ)"
     Type: String
   DBInstanceClass:
     Default: db.m4.large
