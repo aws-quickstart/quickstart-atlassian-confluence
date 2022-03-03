@@ -749,6 +749,8 @@ Conditions:
     !Not [!Equals [!Ref TomcatContextPath, '']]
   UseCustomDnsName:
     !Not [!Equals [!Ref CustomDnsName, '']]
+  UseDatabaseEncryption:
+    !Equals [!Ref DBStorageEncrypted, true]
   UseHostedZone:
     !Not [!Equals [!Ref HostedZone, '']]
   UsePublicIp:
@@ -1039,41 +1041,41 @@ Mappings:
 
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-00d101850e971728d
+      HVM64: ami-08d56ac42e2d4a08b
     ap-northeast-2:
-      HVM64: ami-08ab3f7e72215fe91
+      HVM64: ami-0eb7a369386789460
     ap-south-1:
-      HVM64: ami-00e782930f1c3dbc7
+      HVM64: ami-0dafa01c8100180f8
     ap-southeast-1:
-      HVM64: ami-0b5a47f8865280111
+      HVM64: ami-04fc979a55e14b094
     ap-southeast-2:
-      HVM64: ami-0fb7513bcdc525c3b
+      HVM64: ami-042c4533fa25c105a
     ca-central-1:
-      HVM64: ami-08a9b721ecc5b0a53
+      HVM64: ami-040d8c460f4fc4a9f
     eu-central-1:
-      HVM64: ami-0ebe657bc328d4e82
+      HVM64: ami-00e232b942edaf8f9
     eu-north-1:
-      HVM64: ami-1fb13961
+      HVM64: ami-0e3f1570eb0a9bc7f
     eu-west-1:
-      HVM64: ami-030dbca661d402413
+      HVM64: ami-09d5dd12541e69077
     eu-west-2:
-      HVM64: ami-0009a33f033d8b7b6
+      HVM64: ami-098a393b6fa6e700b
     eu-west-3:
-      HVM64: ami-0ebb3a801d5fb8b9b
+      HVM64: ami-05cb6b584fc3c8ac8
     sa-east-1:
-      HVM64: ami-058141e091292ecf0
+      HVM64: ami-088911543b10876a4
     us-east-1:
-      HVM64: ami-0c6b1d09930fac512
+      HVM64: ami-038b3df3312ddf25d
     us-east-2:
-      HVM64: ami-0ebbf2179e615c338
+      HVM64: ami-07b1d7739c91ed3fc
     us-west-1:
-      HVM64: ami-015954d5e5548d13b
+      HVM64: ami-0729cd65c1a99b0c9
     us-west-2:
-      HVM64: ami-0cb72367e98845d43
+      HVM64: ami-090bc08d7ae1f3881
     us-gov-west-1:
-      HVM64: ami-e9a9d388
+      HVM64: ami-0bbf3595bb2fb39ec
     us-gov-east-1:
-      HVM64: ami-a2d938d3
+      HVM64: ami-0cc17d57bec8c6017
 
 Resources:
   ConfluenceClusterNodeRole:
@@ -1917,6 +1919,87 @@ Resources:
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
+  EncryptionKey:
+    Condition: UseDatabaseEncryption
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Sub "${AWS::StackName}"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action:
+              - kms:CancelKeyDeletion
+              - kms:ConnectCustomKeyStore
+              - kms:CreateAlias
+              - kms:CreateCustomKeyStore
+              - kms:CreateGrant
+              - kms:CreateKey
+              - kms:Decrypt
+              - kms:DeleteAlias
+              - kms:DeleteCustomKeyStore
+              - kms:DeleteImportedKeyMaterial
+              - kms:DescribeCustomKeyStores
+              - kms:DescribeKey
+              - kms:DisableKey
+              - kms:DisableKeyRotation
+              - kms:DisconnectCustomKeyStore
+              - kms:EnableKey
+              - kms:EnableKeyRotation
+              - kms:Encrypt
+              - kms:GenerateDataKey
+              - kms:GenerateDataKeyPair
+              - kms:GenerateDataKeyPairWithoutPlaintext
+              - kms:GenerateDataKeyWithoutPlaintext
+              - kms:GenerateRandom
+              - kms:GetKeyPolicy
+              - kms:GetKeyRotationStatus
+              - kms:GetParametersForImport
+              - kms:GetPublicKey
+              - kms:ImportKeyMaterial
+              - kms:ListAliases
+              - kms:ListGrants
+              - kms:ListKeyPolicies
+              - kms:ListKeys
+              - kms:ListResourceTags
+              - kms:ListRetirableGrants
+              - kms:PutKeyPolicy
+              - kms:ReEncryptFrom
+              - kms:ReEncryptTo
+              - kms:ReplicateKey
+              - kms:RetireGrant
+              - kms:RevokeGrant
+              - kms:ScheduleKeyDeletion
+              - kms:Sign
+              - kms:SynchronizeMultiRegionKey
+              - kms:TagResource
+              - kms:UntagResource
+              - kms:UpdateAlias
+              - kms:UpdateCustomKeyStore
+              - kms:UpdateKeyDescription
+              - kms:UpdatePrimaryRegion
+              - kms:Verify
+            Resource: '*'
+      EnableKeyRotation: true
+      Tags:
+        - Key: Name
+          Value: !Sub ["${StackName} Encryption Key", {StackName: !Ref 'AWS::StackName'}]
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: ec423a0e5112e03efd4c9319b47a8bbde1f45dd8"
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 2021-04-20T00:41:29Z"
+  EncryptionKeyAlias:
+    Condition: UseDatabaseEncryption
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${AWS::StackName}"
+      TargetKeyId: !Ref EncryptionKey
   AnsibleRepoPinSHA:
     Type: AWS::SSM::Parameter
     Properties:
@@ -1978,6 +2061,10 @@ Outputs:
   DBEndpointAddress:
     Description: The Database Connection String
     Value: !GetAtt DB.Outputs.RDSEndPointAddress
+  DBEncryptionKey:
+    Condition: UseDatabaseEncryption
+    Description: The alias of the encryption key created for RDS
+    Value: !Ref EncryptionKeyAlias
   EFSCname:
     Description: The cname of the EFS
     Value: !If
