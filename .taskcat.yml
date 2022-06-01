@@ -6,7 +6,7 @@ project:
   auth:
     us-east-1: tests
   regions:
-    - us-east-1
+  - us-east-1
 tests:
   confluence:
     template: 'templates/quickstart-confluence-master.template.yaml'
@@ -14,10 +14,9 @@ tests:
       DBMasterUserPassword: 'f925dO1ry_'
       DBMultiAZ: 'false'
       DBPassword: 'f925dO1ry_'
-      CidrBlock: '0.0.0.0/0'
       DBStorage: '100'
       DBStorageType: 'Provisioned IOPS'
-      QSS3KeyPrefix: 'quickstart-atlassian-confluence/'
+      CidrBlock: '0.0.0.0/0'
       QSS3BucketName: $[taskcat_autobucket]
-      KeyPairName: 'replaced-by-taskcat-override-file'
+      QSS3KeyPrefix: 'quickstart-atlassian-confluence/'
       BastionHostRequired: 'false'
