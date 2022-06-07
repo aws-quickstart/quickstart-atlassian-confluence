@@ -1,0 +1,22 @@
+project:
+  name: quickstart-atlassian-confluence
+  owner: quickstart-eng@amazon.com
+  package_lambda: false
+  s3_regional_buckets: true
+  auth:
+    us-east-1: tests
+  regions:
+  - us-east-1
+tests:
+  confluence:
+    template: 'templates/quickstart-confluence-master.template.yaml'
+    parameters:
+      DBMasterUserPassword: 'f925dO1ry_'
+      DBMultiAZ: 'false'
+      DBPassword: 'f925dO1ry_'
+      DBStorage: '100'
+      DBStorageType: 'Provisioned IOPS'
+      CidrBlock: '0.0.0.0/0'
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3KeyPrefix: 'quickstart-atlassian-confluence/'
+      BastionHostRequired: 'false'
