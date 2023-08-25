@@ -1,3 +1,5 @@
 // Include details about any licenses and how to sign up. Provide links as appropriate.
 
+This Partner Solution deploys a cluster-ready infrastructure for {partner-product-short-name}. This requires a {partner-product-name} license. See the https://www.atlassian.com/software/confluence/pricing?tab=self-managed[Atlassian pricing page] for licensing information.
+
 There is no cost to use this Partner Solution, but you will be billed for any AWS services or resources that this Partner Solution deploys. For more information, refer to the https://fwd.aws/rA69w?[AWS Partner Solution General Information Guide^].

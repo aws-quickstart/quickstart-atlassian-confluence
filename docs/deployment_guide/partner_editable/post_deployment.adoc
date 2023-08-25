@@ -1,3 +1,49 @@
 // Include any postdeployment steps here, such as steps necessary to test that the deployment was successful. If there are no postdeployment steps, leave this file empty.
 
 == Postdeployment steps
+
+=== Configuring {partner-product-short-name}
+
+The following procedure helps you set up your new {partner-product-short-name} deployment.
+
+include::./_config_application.adoc[]
+
+==== Adding nodes to the {partner-product-short-name} cluster
+
+By default, your Partner Solution deployment starts with a single {partner-product-short-name} node (Auto Scaling group of `min=1` and `max=1`). When you're ready to add nodes to your cluster, perform the following steps:
+
+.	Sign in to the AWS Management Console, use the Region selector in the navigation bar to choose the AWS Region for your deployment, and open the AWS CloudFormation console at https://console.aws.amazon.com/cloudformation/.
+.	Choose the {partner-product-short-name} stack. From the *Actions* list, choose *Update Stack*.
+.	On the *Select Template* page, leave *Use current template* selected, and then choose *Next*.
+.	On the *Specify Details* page, in the *{partner-product-short-name} Setup* section of *Parameters*, enter the number of cluster nodes in *Minimum number of cluster nodes* and *Maximum number of cluster nodes*, and then click through to update the stack. This step sets a static number of nodes in your cluster.
+. After the stack finishes updating, verify the number of nodes in your {partner-product-short-name} cluster. Choose *Clustering* again from the administration console sidebar. The following example shows a cluster that is scaled up to three instances.
++
+.Clustering (multiple nodes)
+image::../docs/deployment_guide/images/qs-step9-connie-clustering.png[]
+
+
+==== (Optional) Adding nodes to the stand-alone Synchrony cluster
+
+NOTE: Proceed with this step only if you set *Collaborative editing mode* to *synchrony-separate-nodes (Standalone Synchrony cluster)*.
+
+.	Sign in to the AWS Management Console, use the Region selector in the navigation bar to choose the AWS Region for your deployment, and open the AWS CloudFormation console at https://console.aws.amazon.com/cloudformation/.
+.	Choose the {partner-product-short-name} stack. From the *Actions* list, choose *Update Stack*.
+.	On the *Select Template* page, leave *Use current template* selected, and then choose *Next*.
+.	On the *Specify Details* page, in the *{partner-product-short-name} Setup* section of *Parameters*, enter the number of cluster nodes in *Minimum number of Synchrony cluster nodes* and *Maximum number of Synchrony cluster nodes*, and then click through to update the stack. This step sets a static number of nodes in your cluster.
+
+==== (If needed) Enabling collaborative editing
+
+NOTE: In older versions of Confluence Data Center, Collaborative Editing is disabled by default. If it is, you’ll need to manually enable it.
+
+. In Confluence Data Center, go to image:icon-gear.png[] *> General Configuration > Collaborative editing*, and check whether collaborative editing is disabled (*off*).
++
+.Collaborative editing (off)
+image::../docs/deployment_guide/images/qs-collabediting-step1.png[]
+. If *Collaborative editing* is disabled, choose *Change Mode*. From the *Change editing mode* page, choose *On*, and then choose *Change*.
++
+.Change editing mode
+image::../docs/deployment_guide/images/qs-collabediting-step2.png[]
+. Verify that collaborative editing is on and that the status of Synchrony is *Running*.
++
+.Collaborative editing (on)
+image::../docs/deployment_guide/images/qs-collabediting-step3.png[]
